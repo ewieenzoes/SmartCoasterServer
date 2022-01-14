@@ -1,0 +1,8 @@
+<div hx-get="/testdata" hx-trigger="every 2s">
+    <h1>Alle Screenings</h1>
+          {% for coaster in coasterTemplateData %}
+            <li>Füllstand Glas auf Untersetzer {{ coaster.identifier }}: <b>{{ coaster.glass_level }}%</b></li>
+        {% endfor %}
+</div>
+
+<script src="https://unpkg.com/htmx.org@1.6.1"></script>
