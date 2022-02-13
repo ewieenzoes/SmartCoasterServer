@@ -1,0 +1,91 @@
+<script src="https://unpkg.com/htmx.org@1.6.1"></script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Project C | Uni Siegen</title>
+    {% block css %}
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
+        <script src="//unpkg.com/alpinejs" defer></script>
+        <style>
+            [x-cloak] {
+                display: none !important;
+            }
+        </style>
+        {% block extra_css %}
+
+        {% endblock extra_css %}
+    {% endblock css %}
+</head>
+<body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+
+<div class="container mt-5">
+
+
+    <div hx-get="/overview" hx-trigger="every 2s">
+        <!-- OLD VERSION
+        <h1 class="title">Getränke Übersicht (Old)</h1>
+        {% for coaster in coasterTemplateData %}
+            {% if coaster.timeout is False %}
+                {% if coaster.glass_level <= 30 %}
+                    <div class="mb-5" x-data="{show:true}">
+                        <article class="message is-warning" x-show="show">
+                            <div class="message-header">
+                                <p>Untersetzer Tisch: {{ coaster.table }}</p>
+                                <button hx-post="/timeout/{{ coaster.identifier }} @click=" show=false" class="delete"
+                                        aria-label="delete"></button>
+
+                            </div>
+                            <div class="message-body">
+                                Das Glas wird
+                                leer! {{ coaster.glass_level }}%<br><b>Beschreibung: </b>Tisch {{ coaster.table }}
+                                | {{ coaster.description }}
+                            </div>
+
+                            <button hx-post="/timeout/{{ coaster.identifier }}" @click="show=false"
+                                    class="button is-warning ml-3 mb-3">Timeout
+                            </button>
+                            <button hx-post="/newdrink/{{ coaster.identifier }}" @click="show=false"
+                                    class="button is-success ml-3 mb-3">Bekommt neues Getränk
+                            </button>
+                        </article>
+                    </div>
+                {% endif %}
+            {% endif %}
+        {% endfor %}-->
+
+        <!-- NEW VERSION-->
+        <h1 class="title">Getränke Übersicht</h1>
+        {% for coaster in criticalCoaster %}
+            {% if coaster.timeout is False %}
+                <div class="mb-5" x-data="{show:true}">
+                    <article class="message is-warning" x-show="show">
+                        <div class="message-header">
+                            <p>Untersetzer {{ coaster.identifier }} Tisch: {{ coaster.table.identifier }}</p>
+                            <button hx-post="/timeout/{{ coaster.identifier }} @click=" show=false" class="delete"
+                                    aria-label="delete"></button>
+                        </div>
+                        <div class="message-body">
+                            Das Glas wird
+                            leer! <br><b>Letzte Bestellung: </b>{{ coaster.description }}
+                        </div>
+                        <button hx-post="/timeout/{{ coaster.identifier }}" @click="show=false"
+                                class="button is-warning ml-3 mb-3">Timeout
+                        </button>
+                        <button hx-post="/newdrink/{{ coaster.identifier }}" @click="show=false"
+                                class="button is-success ml-3 mb-3">Bekommt neues Getränk
+                        </button>
+                    </article>
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+
+</div>
+
+
+<script src="https://unpkg.com/htmx.org@1.6.1"></script>
+
+</body>
+</html>

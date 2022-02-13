@@ -1,0 +1,60 @@
+<script src="https://unpkg.com/htmx.org@1.6.1"></script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Project C | Uni Siegen</title>
+    {% block css %}
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
+        <script src="//unpkg.com/alpinejs" defer></script>
+        <style>
+            [x-cloak] {
+                display: none !important;
+            }
+
+            .select2-container {
+
+                display: block !important;
+
+            }
+        </style>
+        {% block extra_css %}
+
+        {% endblock extra_css %}
+    {% endblock css %}
+</head>
+<body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+
+<div class="container mt-5" x-data="{ orderModal: false, coasterId:0}"
+     @notify.window="coasterId = $event.detail">
+
+
+    <div>
+        <h1 class="title">Alle Tische:</h1>
+        {% for table in tables %}
+            <div class="mb-5" x-data="{show:true, reset:false}">
+                <article class="message is-warning" x-show="show">
+                    <div class="message-header mb-5">
+                        <p>Tisch {{ forloop.counter }}</p>
+                        <button @click=" show=false" class="delete"
+                                aria-label="delete"></button>
+
+                    </div>
+
+                    <a href="/table/{{ forloop.counter }}">
+                        <button
+                                class="button is-success ml-3 mb-3">Zum Tisch
+                        </button>
+                    </a>
+                </article>
+            </div>
+
+        {% endfor %}
+    </div>
+</div>
+
+
+<script src="https://unpkg.com/htmx.org@1.6.1"></script>
+</body>
+</html>

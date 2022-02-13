@@ -1,0 +1,126 @@
+<script src="https://unpkg.com/htmx.org@1.6.1"></script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Project C | Uni Siegen</title>
+    {% block css %}
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
+        <script src="//unpkg.com/alpinejs" defer></script>
+        <style>
+            [x-cloak] {
+                display: none !important;
+            }
+
+            .select2-container {
+
+                display: block !important;
+
+            }
+        </style>
+        {% block extra_css %}
+
+        {% endblock extra_css %}
+    {% endblock css %}
+</head>
+<body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+
+<div class="container mt-5" x-data="{ orderModal: false, coasterId:0}"
+     @notify.window="coasterId = $event.detail">
+
+
+    <div>
+        <h1 class="title">Tisch {{ tableId }} Übersicht</h1>
+        {% for n in tableTemplateData %}
+            <div class="mb-5" x-data="{show:true, reset:false}">
+                <article class="message is-warning" x-show="show">
+                    <div class="message-header mb-5">
+                        <p>Untersetzer {{ forloop.counter }}</p>
+                        <button @click=" show=false" class="delete"
+                                aria-label="delete"></button>
+
+                    </div>
+
+
+                    <button @click="orderModal=true, $dispatch('notify', {{ forloop.counter }} )"
+                            class="button is-warning ml-3 mb-3">Neues Getränk
+                    </button>
+                    <button hx-post="/table/{{ tableId }}/coaster/{{ forloop.counter }}/pay"
+                            @click="reset = true"
+                            class="button is-success ml-3 mb-3">Zahlung
+                    </button>
+                    <button x-cloak x-show="reset" hx-post="/table/{{ tableId }}/coaster/{{ forloop.counter }}/delete"
+                            class="button is-danger ml-3 mb-3">Löschen
+                    </button>
+                </article>
+            </div>
+
+        {% endfor %}
+    </div>
+    <div class="modal is-active" x-show="orderModal" x-cloak>
+        <div class="modal-background"></div>
+        <div class="modal-content">
+            <!-- Any other Bulma elements you want -->
+            <article class="message">
+                <div class="message-body">
+                    <h1 class="title">Standarts</h1>
+                    <button @click="postBev({{ tableId }}, coasterId, 'Pils', '0.4')"
+                            class="button is-success ml-3 mb-3">Pils 0,4
+                    </button>
+                    <button @click="postBev({{ tableId }}, coasterId, 'Cola', '0.3')"
+                            class="button is-success ml-3 mb-3">Cola
+                    </button>
+                    <button @click="postBev({{ tableId }}, coasterId, 'Weizen', '0.5')"
+                            class="button is-success ml-3 mb-3">Weizen
+                    </button>
+                    <button @click="postBev({{ tableId }}, coasterId, 'Wasser', '0.75')"
+                            class="button is-success ml-3 mb-3">Flasche Wasser
+                    </button>
+                    <button @click="postBev({{ tableId }}, coasterId, 'Cappuchino', '0.35')"
+                            class="button is-success ml-3 mb-3">Cappuchino
+                    </button>
+                    <h1 class="title">Suche</h1>
+                    <select class="js-example-basic-multiple" name="states[]" multiple="multiple">
+                        <option value="AL">Cola</option>
+                        <option value="WY">Fanta</option>
+                        <option value="WY">Sprite</option>
+                        <option value="WY">Mezzo Mix</option>
+                        <option value="WY">Pils 0,3</option>
+                        <option value="WY">Weizen</option>
+                        <option value="WY">Tee Schwarz</option>
+                        <option value="WY">Tee Grün</option>
+                        <option value="WY">Holunder Schorle</option>
+                        <option value="WY">O-Saft</option>
+                    </select>
+                    <button @click="orderModal = false"
+                            class="button is-danger mt-5">Fertig
+                    </button>
+                </div>
+            </article>
+        </div>
+        <button class="modal-close is-large" aria-label="close" @click="orderModal = false"></button>
+    </div>
+
+</div>
+
+
+<script src="https://unpkg.com/htmx.org@1.6.1"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.slim.min.js"
+        integrity="sha256-u7e5khyithlIdTpu22PHhENmPcRdFiHRjhAuHcs05RI=" crossorigin="anonymous"></script>
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $('.js-example-basic-multiple').select2();
+    });
+</script>
+<script>
+    async function postBev(tableId, coasterId, bevName, bevEdit) {
+        await fetch('/table/' + tableId + '/coaster/' + coasterId + '/new/' + bevName + '/' + bevEdit)
+    }
+</script>
+
+</body>
+</html>
