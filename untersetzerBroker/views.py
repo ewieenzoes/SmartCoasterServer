@@ -76,7 +76,7 @@ def getTable(request, identifier):
 
 def tablePayCoaster(request, identifier, coasterId):
     # table = Table.objects.get(identifier=identifier)
-    glass = Untersetzer.objects.get(identifier=coasterId)
+    glass = Untersetzer.objects.get(identifier=coasterId, table__identifier=identifier)
     bill = 0.0
     for bevs in glass.beverage.all():
         bill += bevs.price
@@ -84,7 +84,9 @@ def tablePayCoaster(request, identifier, coasterId):
 
 
 def tableDeleteCoaster(request, identifier, coasterId):
-    coaster = Beverage.objects.filter(coaster_id=coasterId).delete()
+    coaster = Untersetzer.objects.get(identifier=coasterId, table__identifier=identifier)
+    for bevs in coaster.beverage.all():
+        bevs.delete()
     return HttpResponse("Getränke gelöscht!")
 
 
@@ -99,6 +101,8 @@ def tableNewBeverage(request, identifier, coasterId, beverageName, beverageEditi
         price = 4.50
     elif beverageName == 'Cappuchino':
         price = 4.50
-    b = Beverage.objects.create(name=beverageName, edition=beverageEdition, price=price, coaster_id=coasterId)
-    c = Untersetzer.objects.filter(identifier=coasterId).update(description=beverageName + beverageEdition)
+    coaster = Untersetzer.objects.filter(identifier=coasterId, table__identifier=identifier).get()
+    b = Beverage.objects.create(name=beverageName, edition=beverageEdition, price=price, coaster=coaster)
+    c = Untersetzer.objects.filter(identifier=coasterId, table__identifier=identifier).update(
+        description=beverageName + beverageEdition)
     return HttpResponse("Added")
