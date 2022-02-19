@@ -29,3 +29,6 @@ class Table(models.Model):
 
     def __str__(self):
         return 'Tisch' + self.identifier
+
+class lastBeverages(models.Model):
+    beverages = models.ForeignKey('Beverage', on_delete=models.CASCADE, related_name='new_beverage')

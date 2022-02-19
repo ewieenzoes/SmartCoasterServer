@@ -5,7 +5,7 @@ from django.shortcuts import render
 
 # Create your views here.
 from django.http import HttpResponse
-from untersetzerBroker.models import Untersetzer, Table, Beverage
+from untersetzerBroker.models import Untersetzer, Table, Beverage, lastBeverages
 
 
 def index(request):
@@ -43,12 +43,13 @@ def timeout(request, identifier):
 def overview(request):
     allCoasterData = Untersetzer.objects.all()  # All Data (Old Approach)
     criticalCoaster = []  # Init List for critical Coasters
+    newDrinks = lastBeverages.objects.all()  # Get new Drinks
     for coaster in allCoasterData:  # Iterate over Coaster and check for critical
         if coaster.description == 'Cola0.3' and coaster.glass_level <= 320:
             criticalCoaster.append(coaster)
         elif coaster.description == 'Weizen0.5' and coaster.glass_level <= 650:
             criticalCoaster.append(coaster)
-    return render(request, 'main.html', {'coasterTemplateData': allCoasterData, 'criticalCoaster': criticalCoaster})
+    return render(request, 'main.html', {'coasterTemplateData': allCoasterData, 'criticalCoaster': criticalCoaster, 'newDrinks':newDrinks})
 
 
 def newdrink(request, identifier):
@@ -82,6 +83,14 @@ def tablePayCoaster(request, identifier, coasterId):
         bill += bevs.price
     return HttpResponse(round(bill, 2))
 
+def tablePayTable(request, identifier):
+    table = Table.objects.get(identifier=identifier)
+    bill = 0.0
+    for coaster in table.coasters:
+        for bevs in coaster.beverage.all():
+            bill += bevs.price
+    return HttpResponse(round(bill, 2))
+
 
 def tableDeleteCoaster(request, identifier, coasterId):
     coaster = Untersetzer.objects.get(identifier=coasterId, table__identifier=identifier)
@@ -91,18 +100,24 @@ def tableDeleteCoaster(request, identifier, coasterId):
 
 
 def tableNewBeverage(request, identifier, coasterId, beverageName, beverageEdition):
-    if beverageName == 'Cola':
-        price = 3.99
-    elif beverageName == 'Pils' and beverageEdition == '0.4':
-        price = 4.50
-    elif beverageName == 'Weizen':
-        price = 4.50
-    elif beverageName == 'Wasser':
-        price = 4.50
-    elif beverageName == 'Cappuchino':
-        price = 4.50
-    coaster = Untersetzer.objects.filter(identifier=coasterId, table__identifier=identifier).get()
-    b = Beverage.objects.create(name=beverageName, edition=beverageEdition, price=price, coaster=coaster)
-    c = Untersetzer.objects.filter(identifier=coasterId, table__identifier=identifier).update(
-        description=beverageName + beverageEdition)
-    return HttpResponse("Added")
+    if request.method == 'POST':
+        for bev in request.POST['multiselect']:
+            None
+        return HttpResponse("Added (Req: Post)")
+    else:
+        if beverageName == 'Cola':
+            price = 3.99
+        elif beverageName == 'Pils' and beverageEdition == '0.4':
+            price = 4.50
+        elif beverageName == 'Weizen':
+            price = 4.50
+        elif beverageName == 'Wasser':
+            price = 4.50
+        elif beverageName == 'Cappuchino':
+            price = 4.50
+        coaster = Untersetzer.objects.filter(identifier=coasterId, table__identifier=identifier).get()
+        b = Beverage.objects.create(name=beverageName, edition=beverageEdition, price=price, coaster=coaster)
+        l = lastBeverages.objects.create(beverages=b)
+        c = Untersetzer.objects.filter(identifier=coasterId, table__identifier=identifier).update(
+            description=beverageName + beverageEdition)
+        return HttpResponse("Added")
