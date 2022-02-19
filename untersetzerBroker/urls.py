@@ -7,8 +7,8 @@ urlpatterns = [
     path('testdata', views.overviewTest, name='testdata'),
     path('level/<str:identifier>/<int:glass_level>', views.level, name='level'),
     path('overview/', views.overview, name='overview'),
-    path('timeout/<str:identifier>', views.timeout, name='timeout'),
-    path('newdrink/<str:identifier>', views.newdrink, name='newdrink'),
+    path('timeout/<str:identifier>/<str:tableId>', views.timeout, name='timeout'),
+    path('newdrink/<str:identifier>/<str:tableId>', views.newdrink, name='newdrink'),
     path('table/', views.allTables, name='allTables'),
     path('table/<str:identifier>', views.getTable, name='table'),
     path('table/<str:identifier>/coaster/<str:coasterId>/pay', views.tablePayCoaster, name='PayCoaster'),
@@ -16,4 +16,7 @@ urlpatterns = [
     path('table/<str:identifier>/coaster/<str:coasterId>/delete', views.tableDeleteCoaster, name='DeleteCoaster'),
     path('table/<str:identifier>/coaster/<str:coasterId>/new/<str:beverageName>/<str:beverageEdition>',
          views.tableNewBeverage, name='AddToCoaster'),
+    path('table/<str:identifier>/coaster/<str:coasterId>/new/multi',
+         views.tableNewBeverageMulti, name='AddToCoasterMulti'),
+    path('lastBeverages/<str:identifier>/delete', views.newDrinksDeleteLatest, name='newDrinksDeleteLatest'),
 ]

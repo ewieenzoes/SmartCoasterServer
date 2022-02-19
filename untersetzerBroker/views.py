@@ -27,9 +27,9 @@ def overviewTest(request):
     return render(request, 'test.html', {'coasterTemplateData': allCoasterData})
 
 
-def timeout(request, identifier):
+def timeout(request, identifier, tableId):
     if identifier != '':
-        glass = Untersetzer.objects.get(identifier=identifier)
+        glass = Untersetzer.objects.get(identifier=identifier, table__identifier=tableId)
         glass.timeout = True
         glass.save()
         sleep(180)  # Timeout 3 Minuten
@@ -49,12 +49,13 @@ def overview(request):
             criticalCoaster.append(coaster)
         elif coaster.description == 'Weizen0.5' and coaster.glass_level <= 650:
             criticalCoaster.append(coaster)
-    return render(request, 'main.html', {'coasterTemplateData': allCoasterData, 'criticalCoaster': criticalCoaster, 'newDrinks':newDrinks})
+    return render(request, 'main.html',
+                  {'coasterTemplateData': allCoasterData, 'criticalCoaster': criticalCoaster, 'newDrinks': newDrinks})
 
 
-def newdrink(request, identifier):
+def newdrink(request, identifier, tableId):
     if identifier != '':
-        glass = Untersetzer.objects.get(identifier=identifier)
+        glass = Untersetzer.objects.get(identifier=identifier, table__identifier=tableId)
         glass.glass_level = 1000
         glass.save()
         return HttpResponse("Updated")
@@ -83,10 +84,11 @@ def tablePayCoaster(request, identifier, coasterId):
         bill += bevs.price
     return HttpResponse(round(bill, 2))
 
+
 def tablePayTable(request, identifier):
-    table = Table.objects.get(identifier=identifier)
+    glass = Untersetzer.objects.filter(table__identifier=identifier)
     bill = 0.0
-    for coaster in table.coasters:
+    for coaster in glass:
         for bevs in coaster.beverage.all():
             bill += bevs.price
     return HttpResponse(round(bill, 2))
@@ -121,3 +123,17 @@ def tableNewBeverage(request, identifier, coasterId, beverageName, beverageEditi
         c = Untersetzer.objects.filter(identifier=coasterId, table__identifier=identifier).update(
             description=beverageName + beverageEdition)
         return HttpResponse("Added")
+
+
+def tableNewBeverageMulti(request, identifier, coasterId):
+    beverages = request.POST.getlist('beverages[]')
+    for beverage in enumerate(beverages):
+        print(beverage)
+    resp = HttpResponse("Added")
+    resp['HX-Redirect'] = '/table/' + identifier
+    return resp
+
+
+def newDrinksDeleteLatest(request, identifier):
+    deleted = lastBeverages.objects.filter(id=identifier).delete()
+    return HttpResponse("Getränke gelöscht!")

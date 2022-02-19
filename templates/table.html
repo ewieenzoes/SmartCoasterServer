@@ -32,6 +32,11 @@
 
     <div>
         <h1 class="title">Tisch {{ tableId }} Übersicht</h1>
+        <article class="message is-dark">
+            <div class="message-body">
+                <b>Rechnung: </b><span hx-get="/table/{{ tableId }}/pay" hx-trigger="every 5s">Gesamtpreis wird kalkuliert...</span>€
+            </div>
+        </article>
         {% for n in tableTemplateData %}
             <div class="mb-5" x-data="{show:true, reset:false}">
                 <article class="message is-warning" x-show="show">
@@ -62,6 +67,13 @@
         <div class="modal-background"></div>
         <div class="modal-content">
             <!-- Any other Bulma elements you want -->
+
+            <article class="message is-success" x-data="{ showBev: false }" x-show="showBev"
+                     @bevsuccess.window="showBev=true" @bevover.window="showBev=false">
+                <div class="message-body">
+                    Getränk wurde gebucht!
+                </div>
+            </article>
             <article class="message">
                 <div class="message-body">
                     <h1 class="title">Standarts</h1>
@@ -81,21 +93,24 @@
                             class="button is-success ml-3 mb-3">Cappuchino
                     </button>
                     <h1 class="title">Suche</h1>
-                    <select class="js-example-basic-multiple" name="states[]" multiple="multiple">
-                        <option value="AL">Cola</option>
-                        <option value="WY">Fanta</option>
-                        <option value="WY">Sprite</option>
-                        <option value="WY">Mezzo Mix</option>
-                        <option value="WY">Pils 0,3</option>
-                        <option value="WY">Weizen</option>
-                        <option value="WY">Tee Schwarz</option>
-                        <option value="WY">Tee Grün</option>
-                        <option value="WY">Holunder Schorle</option>
-                        <option value="WY">O-Saft</option>
-                    </select>
-                    <button @click="orderModal = false"
-                            class="button is-danger mt-5">Fertig
-                    </button>
+                    <form @submit.prevent="">
+                        <select class="js-example-basic-multiple" name="beverages[]" multiple="multiple">
+                            <option value="Cola">Cola</option>
+                            <option value="Fanta">Fanta</option>
+                            <option value="Sprite">Sprite</option>
+                            <option value="Mezzo Mix">Mezzo Mix</option>
+                            <option value="Pils 0,3">Pils 0,3</option>
+                            <option value="Weizen">Weizen</option>
+                            <option value="Tee Schwarz">Tee Schwarz</option>
+                            <option value="Tee Grün">Tee Grün</option>
+                            <option value="Holunder Schorle">Holunder Schorle</option>
+                            <option value="O-Saft">O-Saft</option>
+                        </select>
+                        <button @click="orderModal = false"
+                                class="button is-danger mt-5"
+                                hx-post="/table/{{ tableId }}/coaster/1/new/multi">Fertig
+                        </button>
+                    </form>
                 </div>
             </article>
         </div>
@@ -118,7 +133,20 @@
 </script>
 <script>
     async function postBev(tableId, coasterId, bevName, bevEdit) {
-        await fetch('/table/' + tableId + '/coaster/' + coasterId + '/new/' + bevName + '/' + bevEdit)
+        let response = await fetch('/table/' + tableId + '/coaster/' + coasterId + '/new/' + bevName + '/' + bevEdit)
+        if (response.ok) { // if HTTP-status is 200-299
+
+            let event = new Event("bevsuccess");
+            dispatchEvent(event);
+            setTimeout(function () {
+                let event_2 = new Event("bevover");
+                dispatchEvent(event_2);
+            }, 2000);
+
+
+        } else {
+            alert("HTTP-Error: " + response.status);
+        }
     }
 </script>
 
