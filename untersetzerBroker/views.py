@@ -44,7 +44,7 @@ def overview(request):
     allCoasterData = Untersetzer.objects.all()  # All Data (Old Approach)
     criticalCoaster = []  # Init List for critical Coasters
     newDrinks = lastBeverages.objects.all()  # Get new Drinks
-    for coaster in allCoasterData:  # Iterate over Coaster and check for critical
+    for coaster in allCoasterData:  # Iterate over Coaster and check for critical #To-Do: Move to DB
         if coaster.description == 'Cola0.3' and coaster.glass_level <= 320:
             criticalCoaster.append(coaster)
         elif coaster.description == 'Weizen0.5' and coaster.glass_level <= 650:
@@ -114,7 +114,7 @@ def tableNewBeverage(request, identifier, coasterId, beverageName, beverageEditi
             c = Untersetzer.objects.filter(identifier=coasterId, table__identifier=identifier).update(
                 description=beverageName + beverageEdition)
         return HttpResponse("Added (Req: Post)")
-    else:
+    else: #To-Do: Move to DB
         if beverageName == 'Cola':
             price = 3.99
         elif beverageName == 'Pils' and beverageEdition == '0.4':
@@ -137,7 +137,7 @@ def tableNewBeverageMulti(request, identifier, coasterId):
     beverages = request.POST.getlist('beverages[]')
     for beverageName in enumerate(beverages):
         price = 0.0
-        beverageEdition = ""
+        beverageEdition = "" #To-Do: Move to DB
         if beverageName[1] == 'Cola':
             price = 3.99
             print(beverageName[1])
