@@ -9,7 +9,7 @@ from untersetzerBroker.models import Untersetzer, Table, Beverage, lastBeverages
 
 
 def index(request):
-    return HttpResponse("Hello, world. This is the Füllstand-Endpoint")
+    return HttpResponse("Hello, world. This is Project C by Robert Fischbach & Enzo Frenker-Hackfort.")
 
 
 def level(request, identifier, glass_level):
@@ -103,8 +103,16 @@ def tableDeleteCoaster(request, identifier, coasterId):
 
 def tableNewBeverage(request, identifier, coasterId, beverageName, beverageEdition):
     if request.method == 'POST':
-        for bev in request.POST['multiselect']:
-            None
+        for beverageName in request.POST.getlist['multiselect']:
+            if beverageName == 'Cola':
+                price = 3.99
+            elif beverageName == 'Pils 0,3':
+                price = 4.50
+            coaster = Untersetzer.objects.filter(identifier=coasterId, table__identifier=identifier).get()
+            b = Beverage.objects.create(name=beverageName, edition=beverageEdition, price=price, coaster=coaster)
+            l = lastBeverages.objects.create(beverages=b)
+            c = Untersetzer.objects.filter(identifier=coasterId, table__identifier=identifier).update(
+                description=beverageName + beverageEdition)
         return HttpResponse("Added (Req: Post)")
     else:
         if beverageName == 'Cola':
@@ -127,8 +135,21 @@ def tableNewBeverage(request, identifier, coasterId, beverageName, beverageEditi
 
 def tableNewBeverageMulti(request, identifier, coasterId):
     beverages = request.POST.getlist('beverages[]')
-    for beverage in enumerate(beverages):
-        print(beverage)
+    for beverageName in enumerate(beverages):
+        price = 0.0
+        beverageEdition = ""
+        if beverageName[1] == 'Cola':
+            price = 3.99
+            print(beverageName[1])
+            beverageEdition = "0,3"
+        elif beverageName[1] == 'Pils0.3':
+            price = 4.50
+            beverageEdition = "0,3"
+        coaster = Untersetzer.objects.filter(identifier=coasterId, table__identifier=identifier).get()
+        b = Beverage.objects.create(name=beverageName[1], edition=beverageEdition, price=price, coaster=coaster)
+        l = lastBeverages.objects.create(beverages=b)
+        c = Untersetzer.objects.filter(identifier=coasterId, table__identifier=identifier).update(
+            description=beverageName[1])
     resp = HttpResponse("Added")
     resp['HX-Redirect'] = '/table/' + identifier
     return resp
