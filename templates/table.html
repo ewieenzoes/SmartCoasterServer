@@ -77,10 +77,10 @@
             <article class="message">
                 <div class="message-body">
                     <h1 class="title">Standarts</h1>
-                    <button @click="postBev({{ tableId }}, coasterId, 'Pils', '0.4')"
-                            class="button is-success ml-3 mb-3">Pils 0,4
+                    <button @click="postBev({{ tableId }}, coasterId, 'Keller', '0.3')"
+                            class="button is-success ml-3 mb-3">Kellerbier
                     </button>
-                    <button @click="postBev({{ tableId }}, coasterId, 'Cola', '0.3')"
+                    <button @click="postBev({{ tableId }}, coasterId, 'Cola', '0.2')"
                             class="button is-success ml-3 mb-3">Cola
                     </button>
                     <button @click="postBev({{ tableId }}, coasterId, 'Weizen', '0.5')"
@@ -95,16 +95,43 @@
                     <h1 class="title">Suche</h1>
                     <form @submit.prevent="">
                         <select class="js-example-basic-multiple" name="beverages[]" multiple="multiple">
-                            <option value="Cola">Cola</option>
-                            <option value="Fanta">Fanta</option>
-                            <option value="Sprite">Sprite</option>
-                            <option value="Mezzo Mix">Mezzo Mix</option>
-                            <option value="Pils0.3">Pils 0,3</option>
-                            <option value="Weizen">Weizen</option>
-                            <option value="Tee Schwarz">Tee Schwarz</option>
-                            <option value="Tee Grün">Tee Grün</option>
-                            <option value="Holunder Schorle">Holunder Schorle</option>
-                            <option value="O-Saft">O-Saft</option>
+                            <option value="Riesling">Riesling</option>
+                            <option value="Aperol0.25">Aperol Sprizz</option>
+                            <option value="MineralWasser0.75">Mineralwasser (0,75)</option>
+                            <option value="MineralWasser0.25">Mineralwasser (0,25) M</option>
+                            <option value="Cola0.2">Cola 0,2</option>
+                            <option value="Bluna0.2">Bluna Zitrone/Orange</option>
+                            <option value="Apfelschorle0.25">Apfelschorle </option>
+                            <option value="FrühZitrone0.33">Früh Sport Zitrone</option>
+                            <option value="RadlerFL">Bitburger Radler 0,0%</option>
+                            <option value="PilsFL">Bitburger Pils 0,0%</option>
+                            <option value="VitaMalz0.5">Vita Malz</option>
+                            <option value="BenediktinerWeiss0.5">Benediktiner Weissbier</option>
+                            <option value="Benediktiner0.5">Benediktiner Hell</option>
+                            <option value="Weizen0.5">Benediktiner Weizen</option>
+                            <option value="Koelsch0.3">Früh Kölsch</option>
+                            <option value="Keller0.3">Kellerbier Köstritzer</option>
+                            <option value="Radler0.3">Radler</option>
+                            <option value="Colabier0.3">Colabier</option>
+                            <option value="Schuss0.3">Schuss</option>
+                            <option value="Kaffee">Kaffee</option>
+                            <option value="Milchkaffee">Milchkaffee</option>
+                            <option value="Cappuccino">Cappucino</option>
+                            <option value="CappuccinoSpezial">Cappucino "Spezial"</option>
+                            <option value="LatteMacchiato">Latte Macchiato</option>
+                            <option value="Espresso">Espresso</option>
+                            <option value="EspressoMacchiato">Espresso Macchiato</option>
+                            <option value="Kakao">Kakao</option>
+                            <option value="JackWaeller">Jack Waeller</option>
+                            <option value="AlteMarille">Alte Marille</option>
+                            <option value="AlteWilliams">Alte Williams-Birne</option>
+                            <option value="AlteHimbeere">Alte Himbeere</option>
+                            <option value="AlteKirsche">Alte Kirsche</option>
+                            <option value="AlteQuetsch">Alte Quetsch</option>
+                            <option value="Haselnuss">Haselnuss</option>
+                            <option value="Ramazotti">Ramazotti</option>
+                            <option value="Obstler">Obstler</option>
+                            <option value="Grappa">Grappa</option>
                         </select>
                         <button @click="orderModal = false"
                                 class="button is-danger mt-5"
