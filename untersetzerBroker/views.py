@@ -45,7 +45,7 @@ def overview(request):
     criticalCoaster = []  # Init List for critical Coasters
     newDrinks = lastBeverages.objects.all()  # Get new Drinks
     for coaster in allCoasterData:  # Iterate over Coaster and check for critical #To-Do: Move to DB
-        if coaster.description == 'Riesling' and coaster.glass_level <= 150:
+        if coaster.description == 'Riesling' and coaster.glass_level <= 190:
             criticalCoaster.append(coaster)
         elif coaster.description == 'Aperol0.25' and coaster.glass_level <= 212:
             criticalCoaster.append(coaster)

@@ -22,6 +22,16 @@ class Beverage(models.Model):
     def __str__(self):
         return self.name
 
+## --> Move Beverages in DB (WIP)
+class BeverageTemplate(models.Model):
+    name = models.CharField(max_length=200)
+    price = models.FloatField(default=0)
+    edition = models.CharField(max_length=200)
+    weight = models.IntegerField(default=0)
+
+    def __str__(self):
+        return self.name
+
 
 class Table(models.Model):
     identifier = models.CharField(max_length=200)
