@@ -18,6 +18,7 @@ from django.urls import path, include
 
 urlpatterns = [
     path('', include('untersetzerBroker.urls')),
+    path('gs/', include('guestServices.urls')),
     path('admin/', admin.site.urls),
 
 ]
