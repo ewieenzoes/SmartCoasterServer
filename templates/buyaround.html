@@ -1,0 +1,120 @@
+<script src="https://unpkg.com/htmx.org@1.6.1"></script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Project C | Uni Siegen</title>
+    {% block css %}
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
+        <script src="//unpkg.com/alpinejs" defer></script>
+        <style>
+            [x-cloak] {
+                display: none !important;
+            }
+
+            .select2-container {
+
+                display: block !important;
+                width: 350px !important;
+
+            }
+        </style>
+        {% block extra_css %}
+
+        {% endblock extra_css %}
+    {% endblock css %}
+</head>
+<body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+
+<div class="container mt-5 mx-5" x-data="{ coasterId:0}"
+     @notify.window="coasterId = $event.detail">
+
+
+    <div>
+        <h1 class="title">Tisch {{ tableId }} Buy-A-Round</h1>
+    <div class="message-body">
+
+
+                                <form @submit.prevent="">
+                                <h1 class="title">Getränke-Auswahl</h1>
+                                    <select class="js-example-basic-multiple" name="beverages[]" multiple="multiple">
+                                        {% for i in beverageTemplateData %}
+                                            <option value="{{ i.name }}">{{ i.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                <h1 class="title">Untersetzer-Auswahl</h1>
+                                    <select class="js-example-basic-multiple" name="coasters[]" multiple="multiple">
+                                        {% for i in tableTemplateData %}
+                                            <option value="{{ i.identifier }}">{{ i.identifier }}</option>
+                                        {% endfor %}
+                                    </select>
+                                <h1 class="title">Buchen auf</h1>
+                                    <select class="js-example-basic-multiple" name="payingCoasters[]" multiple="multiple">
+                                        {% for i in tableTemplateData %}
+                                            <option value="{{ i.identifier }}">{{ i.identifier }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <button
+                                            class="button is-danger mt-5"
+                                            hx-post="/table/{{ tableId }}/round/order/">
+                                        Fertig
+                                    </button>
+                                </form>
+                            </div>
+
+    </div>
+
+
+</div>
+
+
+<script src="https://unpkg.com/htmx.org@1.6.1"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.slim.min.js"
+        integrity="sha256-u7e5khyithlIdTpu22PHhENmPcRdFiHRjhAuHcs05RI=" crossorigin="anonymous"></script>
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $('.js-example-basic-multiple').select2();
+    });
+</script>
+<script>
+    async function postBev(tableId, coasterId, bevName, bevEdit) {
+        let response = await fetch('/table/' + tableId + '/coaster/' + coasterId + '/new/' + bevName + '/' + bevEdit)
+        if (response.ok) { // if HTTP-status is 200-299
+
+            let event = new Event("bevsuccess");
+            dispatchEvent(event);
+            setTimeout(function () {
+                let event_2 = new Event("bevover");
+                dispatchEvent(event_2);
+            }, 2000);
+
+
+        } else {
+            alert("HTTP-Error: " + response.status);
+        }
+    }
+
+    async function postFood(tableId, coasterId, foodName) {
+        let response = await fetch('/table/' + tableId + '/coaster/' + coasterId + '/newfood/' + foodName + '/')
+        if (response.ok) { // if HTTP-status is 200-299
+
+            let event = new Event("bevsuccess");
+            dispatchEvent(event);
+            setTimeout(function () {
+                let event_2 = new Event("bevover");
+                dispatchEvent(event_2);
+            }, 2000);
+
+
+        } else {
+            alert("HTTP-Error: " + response.status);
+        }
+    }
+</script>
+
+</body>
+</html>

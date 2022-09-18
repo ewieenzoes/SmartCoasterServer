@@ -26,7 +26,7 @@
 </head>
 <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
 
-<div class="container mt-5" x-data="{ coasterId:0}"
+<div class="container mt-5 mx-5" x-data="{ coasterId:0}"
      @notify.window="coasterId = $event.detail">
 
 
@@ -37,11 +37,18 @@
                 <b>Rechnung: </b><span hx-get="/table/{{ tableId }}/pay" hx-trigger="every 5s">Gesamtpreis wird kalkuliert...</span>€
             </div>
         </article>
+        <a href="/table/{{ tableId }}/round">
+        <button class="button is-link is-outlined ml-3 mb-3">Runde
+        </button></a>
+        <a href="/table/{{ tableId }}/group">
+        <button class="button is-link is-outlined ml-3 mb-3">Gruppe
+        </button></a>
         {% for n in tableTemplateData %}
-            <div class="mb-5" x-data="{orderModal{{ forloop.counter }}: false, show:true, reset:false}">
+            <div class="mb-5"
+                 x-data="{orderModal{{ forloop.counter }}: false, show:true, reset:false, foodModal{{ forloop.counter }}: false,}">
                 <article class="message is-warning" x-show="show">
                     <div class="message-header mb-5">
-                        <p>Untersetzer {{ forloop.counter }}</p>
+                        <p>Untersetzer {{ n.identifier }}</p>
                         <button @click=" show=false" class="delete"
                                 aria-label="delete"></button>
 
@@ -51,11 +58,14 @@
                     <button @click="orderModal{{ forloop.counter }}=true, $dispatch('notify', {{ forloop.counter }} )"
                             class="button is-warning ml-3 mb-3">Neues Getränk
                     </button>
-                    <button hx-post="/table/{{ tableId }}/coaster/{{ forloop.counter }}/pay"
+                    <button @click="foodModal{{ forloop.counter }}=true, $dispatch('notifyfood', {{ forloop.counter }} )"
+                            class="button is-warning ml-3 mb-3">Neue Speise
+                    </button>
+                    <button hx-post="/table/{{ tableId }}/coaster/{{ n.identifier }}/pay"
                             @click="reset = true"
                             class="button is-success ml-3 mb-3">Zahlung
                     </button>
-                    <button x-cloak x-show="reset" hx-post="/table/{{ tableId }}/coaster/{{ forloop.counter }}/delete"
+                    <button x-cloak x-show="reset" hx-post="/table/{{ tableId }}/coaster/{{ n.identifier }}/delete"
                             class="button is-danger ml-3 mb-3">Löschen
                     </button>
                 </article>
@@ -73,65 +83,23 @@
                         <article class="message">
                             <div class="message-body">
                                 <h1 class="title">Standarts</h1>
-                                <button @click="postBev({{ tableId }}, coasterId, 'Keller', '0.3')"
-                                        class="button is-success ml-3 mb-3">Kellerbier
-                                </button>
-                                <button @click="postBev({{ tableId }}, coasterId, 'Cola', '0.2')"
-                                        class="button is-success ml-3 mb-3">Cola
-                                </button>
-                                <button @click="postBev({{ tableId }}, coasterId, 'Weizen', '0.5')"
-                                        class="button is-success ml-3 mb-3">Weizen
-                                </button>
-                                <button @click="postBev({{ tableId }}, coasterId, 'Wasser', '0.75')"
-                                        class="button is-success ml-3 mb-3">Flasche Wasser
-                                </button>
-                                <button @click="postBev({{ tableId }}, coasterId, 'Cappuchino', '0.35')"
-                                        class="button is-success ml-3 mb-3">Cappuchino
-                                </button>
+                                {% for i in quickDrink %}
+                                    <button @click="postBev({{ tableId }}, '{{ n.identifier }}',
+                                                    '{{ i.beverage.name }}', {{ i.beverage.edition }})"
+                                            class="button is-success ml-3 mb-3">{{ i.beverage.name }}
+                                    </button>
+                                {% endfor %}
                                 <h1 class="title">Suche</h1>
+
                                 <form @submit.prevent="">
                                     <select class="js-example-basic-multiple" name="beverages[]" multiple="multiple">
-                                        <option value="Riesling">Riesling</option>
-                                        <option value="Aperol0.25">Aperol Sprizz</option>
-                                        <option value="MineralWasser0.75">Mineralwasser (0,75)</option>
-                                        <option value="MineralWasser0.25">Mineralwasser (0,25) M</option>
-                                        <option value="Cola0.2">Cola 0,2</option>
-                                        <option value="Bluna0.2">Bluna Zitrone/Orange</option>
-                                        <option value="Apfelschorle0.25">Apfelschorle</option>
-                                        <option value="FrühZitrone0.33">Früh Sport Zitrone</option>
-                                        <option value="RadlerFL">Bitburger Radler 0,0%</option>
-                                        <option value="PilsFL">Bitburger Pils 0,0%</option>
-                                        <option value="VitaMalz0.5">Vita Malz</option>
-                                        <option value="BenediktinerWeiss0.5">Benediktiner Weissbier</option>
-                                        <option value="Benediktiner0.5">Benediktiner Hell</option>
-                                        <option value="Weizen0.5">Benediktiner Weizen</option>
-                                        <option value="Koelsch0.3">Früh Kölsch</option>
-                                        <option value="Keller0.3">Kellerbier Köstritzer</option>
-                                        <option value="Radler0.3">Radler</option>
-                                        <option value="Colabier0.3">Colabier</option>
-                                        <option value="Schuss0.3">Schuss</option>
-                                        <option value="Kaffee">Kaffee</option>
-                                        <option value="Milchkaffee">Milchkaffee</option>
-                                        <option value="Cappuccino">Cappucino</option>
-                                        <option value="CappuccinoSpezial">Cappucino "Spezial"</option>
-                                        <option value="LatteMacchiato">Latte Macchiato</option>
-                                        <option value="Espresso">Espresso</option>
-                                        <option value="EspressoMacchiato">Espresso Macchiato</option>
-                                        <option value="Kakao">Kakao</option>
-                                        <option value="JackWaeller">Jack Waeller</option>
-                                        <option value="AlteMarille">Alte Marille</option>
-                                        <option value="AlteWilliams">Alte Williams-Birne</option>
-                                        <option value="AlteHimbeere">Alte Himbeere</option>
-                                        <option value="AlteKirsche">Alte Kirsche</option>
-                                        <option value="AlteQuetsch">Alte Quetsch</option>
-                                        <option value="Haselnuss">Haselnuss</option>
-                                        <option value="Ramazotti">Ramazotti</option>
-                                        <option value="Obstler">Obstler</option>
-                                        <option value="Grappa">Grappa</option>
+                                        {% for i in beverageTemplateData %}
+                                            <option value="{{ i.name }}">{{ i.name }}</option>
+                                        {% endfor %}
                                     </select>
                                     <button @click="orderModal{{ forloop.counter }} = false"
                                             class="button is-danger mt-5"
-                                            hx-post="/table/{{ tableId }}/coaster/{{ forloop.counter }}/new/multi">
+                                            hx-post="/table/{{ tableId }}/coaster/{{ n.identifier }}/new/multi">
                                         Fertig
                                     </button>
                                 </form>
@@ -141,9 +109,90 @@
                     <button class="modal-close is-large" aria-label="close"
                             @click="orderModal{{ forloop.counter }} = false"></button>
                 </div>
+                <div class="modal is-active" x-show="foodModal{{ forloop.counter }}" x-cloak>
+                    <div class="modal-background"></div>
+                    <div class="modal-content">
+                        <!-- Any other Bulma elements you want -->
+
+                        <article class="message is-success" x-data="{ showBev: false }" x-show="showBev"
+                                 @bevsuccess.window="showBev=true" @bevover.window="showBev=false">
+                            <div class="message-body">
+                                Speisen wurden gebucht!
+                            </div>
+                        </article>
+                        <article class="message">
+                            <div class="message-body">
+                                <h1 class="title">Standarts</h1>
+                                {% for i in quickFood %}
+                                    <button @click="postFood({{ tableId }}, '{{ n.identifier }}',
+                                                    '{{ i.food.name }}')"
+                                            class="button is-success ml-3 mb-3">{{ i.food.name }}
+                                    </button>
+                                {% endfor %}
+
+                                <h1 class="title">Suche</h1>
+
+                                <form @submit.prevent="">
+                                    <select class="js-example-basic-multiple" name="foods[]" multiple="multiple">
+                                        {% for i in foodTemplateData %}
+                                            <option value="{{ i.name }}">{{ i.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <button @click="orderModal{{ forloop.counter }} = false"
+                                            class="button is-danger mt-5"
+                                            hx-post="/table/{{ tableId }}/coaster/{{ n.identifier }}/new/multifood">
+                                        Fertig
+                                    </button>
+                                </form>
+                            </div>
+                        </article>
+                    </div>
+                    <button class="modal-close is-large" aria-label="close"
+                            @click="foodModal{{ forloop.counter }} = false"></button>
+                </div>
             </div>
 
         {% endfor %}
+    <div class="level is-mobile">
+        <h2 class="title is-4">Sub-Gruppen</h2>
+     <a href="/table/{{ tableId }}/subgroup/">
+    <button class="button is-link">
+    <span class="icon is-small">
+      <i class="fas fa-plus"></i>
+    </span>
+    <span>Hinzufügen</span>
+  </button></a>
+    </div>
+    {% for n in tempGroups %}
+        <div class="mb-5" x-data="{show:true}">
+                    <article class="message is-link" x-show="show">
+                        <div class="message-header">
+                            <p>Subgruppe {{ forloop.counter }}</p>
+                            <button hx-post="/timeout/{{ coaster.identifier }}/{{ coaster.table.identifier }}"
+                                    @click=" show=false" class="delete"
+                                    aria-label="delete"></button>
+                        </div>
+                        <div class="message-body">
+                            <b>Coaster:</b>{% for i in n %} {{ i }}, {% endfor %}
+
+                            <br><b>Rechnung: </b>{{ coaster.description }}
+                        </div>
+                        <button hx-post="/table/{{ n.0.id }}/subgroup/delete/"
+                                @click="show=false"
+                                class="button is-warning ml-3 mb-3">Auflösen
+                        </button>
+                        <span x-data="{ resetSub: false }">
+                            <button hx-post="/table/{{ n.0.id }}/subgroup/pay/"
+                                    @click="resetSub = true"
+                                    class="button is-success ml-3 mb-3">Zahlung
+                            </button>
+                            <button x-cloak x-show="resetSub" hx-post="/table/{{ n.0.id }}/subgroup/paydelete/"
+                                class="button is-danger ml-3 mb-3">Löschen
+                            </button>
+                        </span>
+                    </article>
+                </div>
+    {% endfor %}
     </div>
 
 
@@ -155,6 +204,7 @@
         integrity="sha256-u7e5khyithlIdTpu22PHhENmPcRdFiHRjhAuHcs05RI=" crossorigin="anonymous"></script>
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
 <script>
     $(document).ready(function () {
@@ -164,6 +214,23 @@
 <script>
     async function postBev(tableId, coasterId, bevName, bevEdit) {
         let response = await fetch('/table/' + tableId + '/coaster/' + coasterId + '/new/' + bevName + '/' + bevEdit)
+        if (response.ok) { // if HTTP-status is 200-299
+
+            let event = new Event("bevsuccess");
+            dispatchEvent(event);
+            setTimeout(function () {
+                let event_2 = new Event("bevover");
+                dispatchEvent(event_2);
+            }, 2000);
+
+
+        } else {
+            alert("HTTP-Error: " + response.status);
+        }
+    }
+
+    async function postFood(tableId, coasterId, foodName) {
+        let response = await fetch('/table/' + tableId + '/coaster/' + coasterId + '/newfood/' + foodName + '/')
         if (response.ok) { // if HTTP-status is 200-299
 
             let event = new Event("bevsuccess");

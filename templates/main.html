@@ -20,7 +20,7 @@
 </head>
 <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
 
-<div class="container mt-5">
+<div class="container mt-5 mx-5">
 
 
     <div hx-get="/overview" hx-trigger="every 5s">
@@ -54,7 +54,8 @@
                 {% endif %}
             {% endif %}
         {% endfor %}-->
-
+<div class="columns">
+  <div class="column">
         <!-- NEW VERSION-->
         <h1 class="title">Deckel Übersicht</h1>
         {% for coaster in criticalCoaster %}
@@ -101,7 +102,52 @@
                 </article>
             </div>
         {% endfor %}
+  </div>
+  <div class="column">
+   <h1 class="title">Zahlungswünsche</h1>
+        {% for request in payment %}
+            <div class="mb-5" x-data="{show:true}">
+                <article class="message is-link is-light" x-show="show">
+                    <div class="message-header">
+                        <p>Zahlungswunsch {{ request.type }}: </p>
+                        <button @click=" show=false" class="delete"
+                                aria-label="delete"></button>
+                    </div>
+                    <div class="message-body">
+                        <b>Untersetzer {{ request.coaster.identifier }}</b><br>
+                        Tisch {{ request.coaster.table }}<br>
+                        Art: {{ request.type }}
+                    </div>
+                    <button hx-post="/gs/requestPayment/{{ request.id }}/delete" @click="show=false"
+                            class="button is-link ml-3 mb-3">Zahlung abgeschlossen
+                    </button>
+                </article>
+            </div>
+        {% endfor %}
+    <h1 class="title">Service-Wünsche</h1>
+        {% for request in service %}
+            <div class="mb-5" x-data="{show:true}">
+                <article class="message" x-show="show">
+                    <div class="message-header">
+                        <p>Servicewunsch {{ request.coaster.table }}: </p>
+                        <button @click=" show=false" class="delete"
+                                aria-label="delete"></button>
+                    </div>
+                    <div class="message-body">
+                        <b>Untersetzer {{ request.coaster.identifier }}</b><br>
+                         {{ request.coaster.table }}
+                    </div>
+                    <button hx-post="/gs/callService/{{ request.id }}/delete" @click="show=false"
+                            class="button ml-3 mb-3"> Erledigt
+                    </button>
+                </article>
+            </div>
+        {% endfor %}
     </div>
+  </div>
+</div>
+
+
 
 </div>
 

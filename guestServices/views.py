@@ -8,21 +8,28 @@ from untersetzerBroker.models import Untersetzer, serviceCall, paymentRequest
 def dashboardView(request, coasterId):
     coaster = Untersetzer.objects.filter(identifier=coasterId).get()
     itemList = []
-    for items in coaster:
-        for bevs in coaster.beverage.all():
-            itemList.append(bevs.name)
-        for food in coaster.food.all():
-            itemList.append(food.name)
-    return HttpResponse("Deine Speisen --> Template")
+    for bevs in coaster.beverage.all():
+        itemList.append(bevs)
+    for food in coaster.food.all():
+        itemList.append(food)
+    return render(request, 'guestServices.html', {'dashboardTemplateData': itemList, 'coasterId': coasterId})
 
 def callService(request, coasterId):
-    coaster = Untersetzer.objects.filter(identifier=coasterId).get()
+    #coaster = Untersetzer.objects.filter(identifier=coasterId).get()
     # Send Notification
-    s = serviceCall.objects.create(coaster_id=coasterId)
+    s = serviceCall.objects.get_or_create(coaster_id=coasterId)
     return HttpResponse("Service benachrichtigt")
 
 def requestPayment(request, coasterId, modality):
     coaster = Untersetzer.objects.filter(identifier=coasterId).get()
     # Send Notification
-    p = paymentRequest.objects.create(coaster_id=coasterId, type=modality)
-    return HttpResponse("Zahlung")
+    p = paymentRequest.objects.get_or_create(coaster_id=coasterId, type=modality)
+    return HttpResponse("<div class='notification'>Ihr Zahlungswunsch wurde entgegen genommen.</div>")
+
+def deleteService(request, identifier):
+    deleted = serviceCall.objects.filter(id=identifier).delete()
+    return HttpResponse("Service-Anfrage gelöscht!")
+
+def deletePaymentRequest(request, identifier):
+    deleted = paymentRequest.objects.filter(id=identifier).delete()
+    return HttpResponse("Zahlungswunsch gelöscht!")

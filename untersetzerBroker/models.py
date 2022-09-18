@@ -38,7 +38,19 @@ class BeverageTemplate(models.Model):
     weight = models.IntegerField(default=0)
 
     def __str__(self):
-        return self.name + " " + self.edition
+        return self.name
+
+class QuickAccessTemplate(models.Model):
+    beverage = models.ForeignKey('BeverageTemplate', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.beverage.name
+
+class QuickAccessTemplateFood(models.Model):
+    food = models.ForeignKey('FoodTemplate', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.food.name
 
 class FoodTemplate(models.Model):
     name = models.CharField(max_length=200)
@@ -59,15 +71,15 @@ class lastBeverages(models.Model):
 
 #To-Do: Create View
 class tempCoasterGroup(models.Model):
-    identifier = models.CharField(max_length=200)
     coasters = models.ManyToManyField('Untersetzer')
+    table = models.ForeignKey('Table', on_delete=models.CASCADE, related_name='table_for_tempgroup', blank=True, null=True)
 
     def __str__(self):
-        return self.identifier
+        return 'Gruppe' + str(self.id)
 
 class serviceCall(models.Model):
     coaster = models.ForeignKey('Untersetzer', on_delete=models.CASCADE, related_name='serviceCall')
 
 class paymentRequest(models.Model):
-    coaster = models.ForeignKey('Untersetzer', on_delete=models.CASCADE, related_name='serviceCall')
+    coaster = models.ForeignKey('Untersetzer', on_delete=models.CASCADE)
     type = models.CharField(max_length=200)
