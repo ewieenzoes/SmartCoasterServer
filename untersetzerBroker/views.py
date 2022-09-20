@@ -10,7 +10,7 @@ from untersetzerBroker.models import Untersetzer, Table, Beverage, lastBeverages
 
 
 def index(request):
-    return HttpResponse("Hello, world. This is a master thesis by Robert Fischbach & Enzo Frenker-Hackfort.")
+    return render(request, 'info.html')
 
 
 def level(request, identifier, glass_level):
@@ -308,6 +308,16 @@ def tablePayAndDeleteTempGroup(request, identifier):
         for food in coaster.food.all():
             food.delete()
     group.delete()
+
+    resp = HttpResponse("Deleted")
+    resp['HX-Refresh'] = True
+    return resp
+
+def coasterUndo(request, identifier):
+    # table = Table.objects.get(identifier=identifier)
+    coaster = Untersetzer.objects.get(identifier=identifier)
+    lastBeverage = coaster.beverage.last()
+    delete = lastBeverage.delete()
 
     resp = HttpResponse("Deleted")
     resp['HX-Refresh'] = True
