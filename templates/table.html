@@ -68,6 +68,11 @@
                     <button x-cloak x-show="reset" hx-post="/table/{{ tableId }}/coaster/{{ n.identifier }}/delete"
                             class="button is-danger ml-3 mb-3">Löschen
                     </button>
+                    <button class="button is-danger ml-3" hx-get="/table/{{ n.identifier }}/undo/">
+                        <span class="icon is-small">
+                          <i class="fas fa-undo"></i>
+                        </span>
+                    </button>
                 </article>
                 <div class="modal is-active" x-show="orderModal{{ forloop.counter }}" x-cloak>
                     <div class="modal-background"></div>

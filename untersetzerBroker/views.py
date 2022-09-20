@@ -172,7 +172,7 @@ def tableNewBeverage(request, identifier, coasterId, beverageName, beverageEditi
                                 coaster=coaster)
     l = lastBeverages.objects.create(beverages=b)
     c = Untersetzer.objects.filter(identifier=coasterId, table__identifier=identifier).update(
-        description=beverageTemplate[0].name + beverageTemplate[0].edition)
+        description=beverageTemplate[0].name)
     return HttpResponse("Added")
 
 
@@ -200,7 +200,7 @@ def tableNewBeverageMulti(request, identifier, coasterId):
                                               coaster=coaster)
             l = lastBeverages.objects.create(beverages=booking)
             c = Untersetzer.objects.filter(identifier=coasterId, table__identifier=identifier).update(
-                description=b.name + b.edition)
+                description=b.name)
     resp = HttpResponse("Added")
     resp['HX-Redirect'] = '/table/' + identifier
     return resp
@@ -251,7 +251,7 @@ def rundeAusgeben(request, identifier):
                                         coaster=Untersetzer.objects.filter(identifier=payingCoasters[0])[0])
             l = lastBeverages.objects.create(beverages=b)
             c = Untersetzer.objects.filter(identifier=rcId, table__identifier=identifier).update(
-                description=beverageTemplate[0].name + beverageTemplate[0].edition)
+                description=beverageTemplate[0].name)
     resp = HttpResponse("Added")
     resp['HX-Redirect'] = '/table/' + identifier
     return resp
@@ -270,7 +270,7 @@ def groupOrder(request, identifier):
                                         coaster=Untersetzer.objects.filter(identifier=rcId)[0])
             l = lastBeverages.objects.create(beverages=b)
             c = Untersetzer.objects.filter(identifier=rcId, table__identifier=identifier).update(
-                description=beverageTemplate[0].name + beverageTemplate[0].edition)
+                description=beverageTemplate[0].name)
     resp = HttpResponse("Added")
     resp['HX-Redirect'] = '/table/' + identifier
     return resp
@@ -319,6 +319,6 @@ def coasterUndo(request, identifier):
     lastBeverage = coaster.beverage.last()
     delete = lastBeverage.delete()
 
-    resp = HttpResponse("Deleted")
-    resp['HX-Refresh'] = True
+    resp = HttpResponse("Undo erfolgreich")
+    ##resp['HX-Refresh'] = "true"
     return resp

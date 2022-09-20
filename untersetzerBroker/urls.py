@@ -32,4 +32,5 @@ urlpatterns = [
     path('table/<str:identifier>/subgroup/delete/', views.subGroupDelete, name='subGroupDelete'),
     path('table/<str:identifier>/subgroup/pay/', views.tablePayTempGroup, name='tablePayTempGroup'),
     path('table/<str:identifier>/subgroup/paydelete/', views.tablePayAndDeleteTempGroup, name='tablePayAndDeleteTempGroup'),
+    path('table/<str:identifier>/undo/', views.coasterUndo, name='coasterUndo'),
 ]
