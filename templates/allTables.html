@@ -36,13 +36,13 @@
             <div class="mb-5" x-data="{show:true, reset:false}">
                 <article class="message is-warning" x-show="show">
                     <div class="message-header mb-5">
-                        <p>Tisch {{ forloop.counter }}</p>
+                        <p>Tisch {{ table.identifier }}</p>
                         <button @click=" show=false" class="delete"
                                 aria-label="delete"></button>
 
                     </div>
 
-                    <a href="/table/{{ forloop.counter }}">
+                    <a href="/table/{{ table.identifier }}">
                         <button
                                 class="button is-success ml-3 mb-3">Zum Tisch
                         </button>

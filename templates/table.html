@@ -29,7 +29,6 @@
 <div class="container mt-5 mx-5" x-data="{ coasterId:0}"
      @notify.window="coasterId = $event.detail">
 
-
     <div>
         <h1 class="title">Tisch {{ tableId }} Übersicht</h1>
         <article class="message is-dark">
@@ -37,6 +36,9 @@
                 <b>Rechnung: </b><span hx-get="/table/{{ tableId }}/pay" hx-trigger="every 5s">Gesamtpreis wird kalkuliert...</span>€
             </div>
         </article>
+        <a href="/table/">
+        <button class="button is-link is-outlined ml-3 mb-3">Zur Übersicht
+        </button></a>
         <a href="/table/{{ tableId }}/round">
         <button class="button is-link is-outlined ml-3 mb-3">Runde
         </button></a>
