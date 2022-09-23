@@ -101,7 +101,7 @@ def getSubGroups(request, identifier):
     tableCoaster = []
     for coaster in table.coasters.all():
         tableCoaster.append(coaster)
-    return render(request, 'subGroups.html', {'tableTemplateData': tableCoaster, 'tableId': table.identifier,})
+    return render(request, 'subGroups.html', {'tableTemplateData': tableCoaster, 'tableId': table.identifier })
 
 
 def getTableGroupOrder(request, identifier):
