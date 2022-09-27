@@ -277,7 +277,8 @@ def groupOrder(request, identifier):
 
 def createSubGroup(request, identifier):
     sbCoasters = request.POST.getlist('coasters[]')
-    b = tempCoasterGroup.objects.create(table_id=identifier)
+    t = Table.objects.filter(id=identifier)
+    b = tempCoasterGroup.objects.create(table=t[0])
     for coaster in sbCoasters:
         b.coasters.add(coaster)
 
