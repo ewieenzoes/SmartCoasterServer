@@ -82,7 +82,7 @@ def getTable(request, identifier):
     allFoodData = FoodTemplate.objects.all()  # Get Food templates
     quickDrinkData = QuickAccessTemplate.objects.all()  # Get Food templates
     quickFoodData = QuickAccessTemplateFood.objects.all()  # Get Food templates
-    tempGroups = tempCoasterGroup.objects.filter(table=identifier)  # Get Temp-Coasters
+    tempGroups = tempCoasterGroup.objects.filter(table__identifier=identifier)  # Get Temp-Coasters
     tempGroupsList = []
     for tempGroup in tempGroups:
         #print(tempGroup.coasters.all())
@@ -277,11 +277,12 @@ def groupOrder(request, identifier):
 
 def createSubGroup(request, identifier):
     sbCoasters = request.POST.getlist('coasters[]')
-    t = Table.objects.filter(id=identifier)
-    for table in t:
-        b = tempCoasterGroup.objects.create(table=table)
-        for coaster in sbCoasters:
-            b.coasters.add(coaster)
+    print(sbCoasters)
+    t = Table.objects.filter(identifier=identifier)
+    b = tempCoasterGroup.objects.create(table=t[0])
+    for coaster in sbCoasters:
+        coasterObj = Untersetzer.objects.filter(identifier=coaster)
+        b.coasters.add(coasterObj[0])
 
     resp = HttpResponse("Added")
     resp['HX-Redirect'] = '/table/' + identifier
@@ -312,7 +313,7 @@ def tablePayAndDeleteTempGroup(request, identifier):
     group.delete()
 
     resp = HttpResponse("Deleted")
-    resp['HX-Refresh'] = True
+    resp['HX-Refresh'] = "true"
     return resp
 
 def coasterUndo(request, identifier):
@@ -321,6 +322,6 @@ def coasterUndo(request, identifier):
     lastBeverage = coaster.beverage.last()
     delete = lastBeverage.delete()
 
-    resp = HttpResponse("Undo erfolgreich")
+    resp = HttpResponse("Letztes Getränk entfernt")
     ##resp['HX-Refresh'] = "true"
     return resp
