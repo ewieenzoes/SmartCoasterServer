@@ -278,9 +278,10 @@ def groupOrder(request, identifier):
 def createSubGroup(request, identifier):
     sbCoasters = request.POST.getlist('coasters[]')
     t = Table.objects.filter(id=identifier)
-    b = tempCoasterGroup.objects.create(table=t[0])
-    for coaster in sbCoasters:
-        b.coasters.add(coaster)
+    for table in t:
+        b = tempCoasterGroup.objects.create(table=table)
+        for coaster in sbCoasters:
+            b.coasters.add(coaster)
 
     resp = HttpResponse("Added")
     resp['HX-Redirect'] = '/table/' + identifier
