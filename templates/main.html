@@ -1,30 +1,32 @@
 <script src="https://unpkg.com/htmx.org@1.6.1"></script>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Untersetzer.Digital | Uni Siegen</title>
     {% block css %}
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
-        <script src="//unpkg.com/alpinejs" defer></script>
-        <style>
-            [x-cloak] {
-                display: none !important;
-            }
-        </style>
-        {% block extra_css %}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
+    <script src="//unpkg.com/alpinejs" defer></script>
+    <style>
+        [x-cloak] {
+            display: none !important;
+        }
+    </style>
+    {% block extra_css %}
 
-        {% endblock extra_css %}
+    {% endblock extra_css %}
     {% endblock css %}
 </head>
+
 <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
 
-<div class="container mt-5 mx-5">
+    <div class="container mt-5 mx-5">
 
 
-    <div hx-get="/overview" hx-trigger="every 5s">
-        <!-- OLD VERSION
+        <div hx-get="/overview" hx-trigger="every 5s">
+            <!-- OLD VERSION
         <h1 class="title">Getränke Übersicht (Old)</h1>
         {% for coaster in coasterTemplateData %}
             {% if coaster.timeout is False %}
@@ -54,105 +56,118 @@
                 {% endif %}
             {% endif %}
         {% endfor %}-->
-<div class="columns">
-  <div class="column">
-        <!-- NEW VERSION-->
-        <h1 class="title">Deckel Übersicht</h1>
-        {% for coaster in criticalCoaster %}
-            {% if coaster.timeout is False %}
-                <div class="mb-5" x-data="{show:true}">
-                    <article class="message is-warning" x-show="show">
-                        <div class="message-header">
-                            <p>Untersetzer {{ coaster.identifier }} Tisch: {{ coaster.table.identifier }}</p>
+            <div class="columns">
+                <div class="column">
+                    <!-- NEW VERSION-->
+                    <h1 class="title">Deckel Übersicht</h1>
+                    {% for coaster in criticalCoaster %}
+                    {% if coaster.timeout is False %}
+                    <div class="mb-5" x-data="{show:true}">
+                        <article class="message is-warning" x-show="show">
+                            <div class="message-header">
+                                <p>Untersetzer {{ coaster.identifier }} Tisch: {{ coaster.table.identifier }}</p>
+                                <button hx-post="/timeout/{{ coaster.identifier }}/{{ coaster.table.identifier }}"
+                                    @click=" show=false" class="delete" aria-label="delete"></button>
+                            </div>
+                            <div class="message-body">
+                                Das Glas wird
+                                leer! <br><b>Letzte Bestellung: </b>{{ coaster.description }}
+                            </div>
                             <button hx-post="/timeout/{{ coaster.identifier }}/{{ coaster.table.identifier }}"
-                                    @click=" show=false" class="delete"
-                                    aria-label="delete"></button>
-                        </div>
-                        <div class="message-body">
-                            Das Glas wird
-                            leer! <br><b>Letzte Bestellung: </b>{{ coaster.description }}
-                        </div>
-                        <button hx-post="/timeout/{{ coaster.identifier }}/{{ coaster.table.identifier }}"
-                                @click="show=false"
-                                class="button is-warning ml-3 mb-3">Timeout
-                        </button>
-                        <button hx-post="/newdrink/{{ coaster.identifier }}/{{ coaster.table.identifier }}"
-                                @click="show=false"
-                                class="button is-success ml-3 mb-3">Bekommt neues Getränk
-                        </button>
-                    </article>
+                                @click="show=false" class="button is-warning ml-3 mb-3">Timeout
+                            </button>
+                            <button hx-post="/newdrink/{{ coaster.identifier }}/{{ coaster.table.identifier }}"
+                                @click="show=false" class="button is-success ml-3 mb-3">Bekommt neues Getränk
+                            </button>
+                        </article>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                    <h1 class="title">Neue Getränke</h1>
+                    {% for bev in newDrinks %}
+                    <div class="mb-5" x-data="{show:true}">
+                        <article class="message is-info" x-show="show">
+                            <div class="message-header">
+                                <p>{{ bev.beverages.name }}</p>
+                                <button @click=" show=false" class="delete" aria-label="delete"></button>
+                            </div>
+                            <div class="message-body">
+                                <b>{{ bev.beverages.coaster }}</b>
+                            </div>
+                            <button hx-post="/lastBeverages/{{ bev.id }}/delete" @click="show=false"
+                                class="button is-info ml-3 mb-3">Bestellung Fertig
+                            </button>
+                        </article>
+                    </div>
+                    {% endfor %}
                 </div>
-            {% endif %}
-        {% endfor %}
-        <h1 class="title">Neue Getränke</h1>
-        {% for bev in newDrinks %}
-            <div class="mb-5" x-data="{show:true}">
-                <article class="message is-info" x-show="show">
-                    <div class="message-header">
-                        <p>{{ bev.beverages.name }}</p>
-                        <button @click=" show=false" class="delete"
-                                aria-label="delete"></button>
+                <div class="column">
+                    <h1 class="title">Zahlungswünsche</h1>
+                    {% for request in payment %}
+                    <div class="mb-5" x-data="{show:true}">
+                        <article class="message is-link is-light" x-show="show">
+                            <div class="message-header">
+                                <p>Zahlungswunsch {{ request.type }}: </p>
+                                <button @click=" show=false" class="delete" aria-label="delete"></button>
+                            </div>
+                            <div class="message-body">
+                                <b>Untersetzer {{ request.coaster.identifier }}</b><br>
+                                Tisch {{ request.coaster.table }}<br>
+                                Art: {{ request.type }}
+                            </div>
+                            <button hx-post="/gs/requestPayment/{{ request.id }}/delete" @click="show=false"
+                                class="button is-link ml-3 mb-3">Zahlung abgeschlossen
+                            </button>
+                        </article>
                     </div>
-                    <div class="message-body">
-                        <b>{{ bev.beverages.coaster }}</b>
+                    {% endfor %}
+                    <h1 class="title">Service-Wünsche</h1>
+                    {% for request in service %}
+                    <div class="mb-5" x-data="{show:true}">
+                        <article class="message" x-show="show">
+                            <div class="message-header">
+                                <p>Servicewunsch {{ request.coaster.table }}: </p>
+                                <button @click=" show=false" class="delete" aria-label="delete"></button>
+                            </div>
+                            <div class="message-body">
+                                <b>Untersetzer {{ request.coaster.identifier }}</b><br>
+                                {{ request.coaster.table }}
+                            </div>
+                            <button hx-post="/gs/callService/{{ request.id }}/delete" @click="show=false"
+                                class="button ml-3 mb-3"> Erledigt
+                            </button>
+                        </article>
                     </div>
-                    <button hx-post="/lastBeverages/{{ bev.id }}/delete" @click="show=false"
-                            class="button is-info ml-3 mb-3">Bestellung Fertig
-                    </button>
-                </article>
+                    {% endfor %}
+                    <!-- <h1 class="title">Payments</h1>
+                    {% for request in receipt %}
+                    <div class="mb-5" x-data="{show:true}">
+                        <article class="message" x-show="show">
+                            <div class="message-header">
+                                <p>Payment {{ request.coaster.table }}: </p>
+                                <button @click=" show=false" class="delete" aria-label="delete"></button>
+                            </div>
+                            <div class="message-body">
+                                <b>Untersetzer {{ request.coaster.identifier }}</b><br>
+                                {{ request.coaster.table }}
+                            </div>
+                            <button hx-post="/gs/paymentSuccess/{{ request.id }}/delete" @click="show=false"
+                                class="button ml-3 mb-3"> Paid
+                            </button>
+                        </article>
+                    </div>
+                    {% endfor %} -->
+                </div>
             </div>
-        {% endfor %}
-  </div>
-  <div class="column">
-   <h1 class="title">Zahlungswünsche</h1>
-        {% for request in payment %}
-            <div class="mb-5" x-data="{show:true}">
-                <article class="message is-link is-light" x-show="show">
-                    <div class="message-header">
-                        <p>Zahlungswunsch {{ request.type }}: </p>
-                        <button @click=" show=false" class="delete"
-                                aria-label="delete"></button>
-                    </div>
-                    <div class="message-body">
-                        <b>Untersetzer {{ request.coaster.identifier }}</b><br>
-                        Tisch {{ request.coaster.table }}<br>
-                        Art: {{ request.type }}
-                    </div>
-                    <button hx-post="/gs/requestPayment/{{ request.id }}/delete" @click="show=false"
-                            class="button is-link ml-3 mb-3">Zahlung abgeschlossen
-                    </button>
-                </article>
-            </div>
-        {% endfor %}
-    <h1 class="title">Service-Wünsche</h1>
-        {% for request in service %}
-            <div class="mb-5" x-data="{show:true}">
-                <article class="message" x-show="show">
-                    <div class="message-header">
-                        <p>Servicewunsch {{ request.coaster.table }}: </p>
-                        <button @click=" show=false" class="delete"
-                                aria-label="delete"></button>
-                    </div>
-                    <div class="message-body">
-                        <b>Untersetzer {{ request.coaster.identifier }}</b><br>
-                         {{ request.coaster.table }}
-                    </div>
-                    <button hx-post="/gs/callService/{{ request.id }}/delete" @click="show=false"
-                            class="button ml-3 mb-3"> Erledigt
-                    </button>
-                </article>
-            </div>
-        {% endfor %}
+        </div>
+
+
+
     </div>
-  </div>
-</div>
 
 
-
-</div>
-
-
-<script src="https://unpkg.com/htmx.org@1.6.1"></script>
+    <script src="https://unpkg.com/htmx.org@1.6.1"></script>
 
 </body>
+
 </html>

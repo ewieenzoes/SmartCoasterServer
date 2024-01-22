@@ -1,6 +1,4 @@
 from django.contrib import admin
-
-# Register your models here.
 from .models import Untersetzer, Beverage, Table, BeverageTemplate, FoodTemplate, tempCoasterGroup, QuickAccessTemplate, \
     Food, QuickAccessTemplateFood
 

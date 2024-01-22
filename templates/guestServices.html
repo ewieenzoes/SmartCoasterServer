@@ -1,127 +1,243 @@
 <script src="https://unpkg.com/htmx.org@1.6.1"></script>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8" name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="csrf-token" content="{{ csrf_token }}">
     <title>Untersetzer.Digital | Uni Siegen</title>
     {% block css %}
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
-        <script src="//unpkg.com/alpinejs" defer></script>
-        <style>
-            [x-cloak] {
-                display: none !important;
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
+    <script src="//unpkg.com/alpinejs" defer></script>
+    <style>
+        [x-cloak] {
+            display: none !important;
+        }
+
+        .select2-container {
+
+            display: block !important;
+
+        }
+
+        body {
+            margin: 0;
+            padding: -10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 50vh;
+        }
+
+        .receipt-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 800px;
+            width: 100%;
+        }
+
+        .bill-section {
+            width: 70%;
+        }
+
+        .payment-section {
+            width: 30%;
+        }
+
+        @media (max-width: 768px) {
+
+            body {
+                padding: 10px;
             }
 
-            .select2-container {
-
-                display: block !important;
-
+            .receipt-container {
+                flex-direction: column;
+                align-items: center;
             }
-        </style>
-        {% block extra_css %}
 
-        {% endblock extra_css %}
+            .bill-section,
+            .payment-section {
+                width: 100%;
+            }
+        }
+
+        #innerBox {
+            padding: 10px;
+            /* Adjust the padding as needed */
+        }
+
+        #paypal-button-container {
+            margin-top: 20px;
+            /* Add margin to separate it from the "innerBox" */
+        }
+    </style>
+    {% block extra_css %}
+
+    {% endblock extra_css %}
     {% endblock css %}
 </head>
+
 <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+    <div class="receipt-container">
+        <div class="bill-section">
+            <h2 class="title is-4">Ihr Verzehr</h2>
 
-<div class="container mt-5 ml-5">
-    <h2 class="title is-4">Ihr Verzehr</h2>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Speisen/Getränke</th>
+                        <th>Preis</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for i in dashboardTemplateData %}
+                    <tr>
+                        <td>{{ i }}</td>
+                        <td>{{ i.price }}€</td>
+                    </tr>
+                    {% endfor %}
+                    <tr>
+                        <td>Total</td>
+                        <td>{{ total_price }}€</td>
+                    </tr>
+                </tbody>
+            </table>
 
-    <table class="table">
-        <thead>
-        <tr>
-            <th>Speisen/Getränke</th>
-            <th>Preis</th>
-        </tr>
-        </thead>
-        <tbody>
-            {% for i in dashboardTemplateData %}
-                <tr>
-                    <td>{{ i }}</td>
-                    <td>{{ i.price }}€</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-
-    <div x-data="{ service: false, payment:false }">
-        <div class="modal is-active" x-show="service" x-cloak>
-            <div class="modal-background"></div>
-            <div class="modal-content">
-                <!-- Any other Bulma elements you want -->
-                <div class="card">
-                    <div class="card-content">
-                        <div class="content">
-                            <h4 class="title is-4">Wir sind gleich für Sie da.</h4>
-                            <p>Der Service wurde infomiert und kommt zu Ihrem Platz.</p>
-                        </div>
-                    </div>
-                    <footer class="modal-card-foot">
-                        <button class="button is-success" @click="service = false">Ok!</button>
-                    </footer>
-                </div>
-            </div>
-            <button class="modal-close is-large" aria-label="close"></button>
-        </div>
-        <div class="modal is-active" x-show="payment" x-cloak>
-            <div class="modal-background"></div>
-            <div class="modal-content">
-                <!-- Any other Bulma elements you want -->
-                <div class="card">
-                    <div class="card-content">
-                        <div class="content">
-                            <h4 class="title is-4">Wie möchten Sie bezahlen?</h4>
-                            <div id="innerBox">
-                                <button class="button is-light" hx-post="/gs/requestPayment/{{ coasterId }}/Bar/"  hx-target="#innerBox">Bar-Zahlung</button>
-                                <button class="button is-light" hx-post="/gs/requestPayment/{{ coasterId }}/Karte/" hx-target="#innerBox">Karten-Zahlung</button>
+            <div x-data="{ service: false, payment:false }">
+                <div class="modal is-active" x-show="service" x-cloak>
+                    <div class="modal-background"></div>
+                    <div class="modal-content">
+                        <!-- Any other Bulma elements you want -->
+                        <div class="card">
+                            <div class="card-content">
+                                <div class="content">
+                                    <h4 class="title is-4">Wir sind gleich für Sie da.</h4>
+                                    <p>Der Service wurde infomiert und kommt zu Ihrem Platz.</p>
+                                </div>
                             </div>
+                            <footer class="modal-card-foot">
+                                <button class="button is-success"
+                                    @click="service = false; showPayPalButton()">Ok!</button>
+                            </footer>
                         </div>
                     </div>
-                    <footer class="modal-card-foot">
-                        <button class="button is-danger" @click="payment = false">Schließen</button>
-                    </footer>
+                    <button class="modal-close is-large" aria-label="close"></button>
                 </div>
+                <div class="modal is-active" x-show="payment" x-cloak>
+                    <div class="modal-background"></div>
+                    <div class="modal-content">
+                        <!-- Any other Bulma elements you want -->
+                        <div class="card">
+                            <div class="card-content">
+                                <div class="content">
+                                    <h4 class="title is-4">Wie möchten Sie bezahlen?</h4>
+                                    <div id="innerBox" class="buttons">
+                                        <button class="button is-light"
+                                            hx-post="/gs/requestPayment/{{ coasterId }}/Bar/"
+                                            hx-target="#innerBox">Bar-Zahlung</button>
+                                        <button class="button is-light"
+                                            hx-post="/gs/requestPayment/{{ coasterId }}/Karte/"
+                                            hx-target="#innerBox">Karten-Zahlung</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <footer class="modal-card-foot">
+                                <button class="button is-danger"
+                                    @click="payment = false; showPayPalButton();">Schließen</button>
+                            </footer>
+                        </div>
+                    </div>
+                    <button class="modal-close is-large" aria-label="close"></button>
+                </div>
+                <h2 class="title is-4">Weitere Optionen</h2>
+                <button class="button is-light" @click="payment = true; hidePayPalButton();">Bezahl-Wunsch</button>
+                <button class="button is-dark" @click="service = true; hidePayPalButton()"
+                    hx-post="/gs/callService/{{ coasterId }}/" hx-swap="outerHTML">Service</button>
             </div>
-            <button class="modal-close is-large" aria-label="close"></button>
         </div>
-        <h2 class="title is-4">Weitere Optionen</h2>
-        <button class="button is-light" @click="payment = true">Bezahl-Wunsch</button>
-        <button class="button is-dark" @click="service = true" hx-post="/gs/callService/{{ coasterId }}/" hx-swap="outerHTML">Service</button>
+        <div class="payment-section">
+            <h2>Payment Options</h2>
+            <div id="paypal-button-container">
+            </div>
+            <script
+                src="https://www.paypal.com/sdk/js?client-id=AUoTbHfJhP1kvaRBU3UeLpIK15PN8r7a6-yRlwylB0t2rzlUB20RpCLsljf3R-k8pCRj5mdaaKgbK8AI&currency=EUR"></script>
+
+            <script>
+                var coasterId = '{{ coasterId }}'
+                var total = '{{ total_price }}'
+                var tableId = '{{ tableId }}'
+
+                // Function to redirect to the bill page
+                function redirectToBill(coasterId) {
+                    window.location.href = '/gs/bill/' + coasterId;
+                }
+
+                // Render the PayPal button into #paypal-button-container
+                paypal.Buttons({
+                    createOrder: function (data, actions) {
+                        // Set up the transaction
+                        return actions.order.create({
+                            purchase_units: [{
+                                amount: {
+                                    value: total
+                                }
+                            }]
+                        });
+                    },
+                    onApprove: function (data, actions) {
+                        // Capture the funds from the transaction
+                        return actions.order.capture().then(function (details) {
+                            redirectToBill(coasterId);
+                        });
+                    }
+                }).render('#paypal-button-container');
+            </script>
+
+        </div>
     </div>
-</div>
 
 
-<script src="https://unpkg.com/htmx.org@1.6.1"></script>
-<script src="https://code.jquery.com/jquery-3.6.0.slim.min.js"
+    <script src="https://unpkg.com/htmx.org@1.6.1"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.slim.min.js"
         integrity="sha256-u7e5khyithlIdTpu22PHhENmPcRdFiHRjhAuHcs05RI=" crossorigin="anonymous"></script>
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
-<script>
-    $(document).ready(function () {
-        $('.js-example-basic-multiple').select2();
-    });
-</script>
-<script>
-    async function postBev(tableId, coasterId, bevName, bevEdit) {
-        let response = await fetch('/table/' + tableId + '/coaster/' + coasterId + '/new/' + bevName + '/' + bevEdit)
-        if (response.ok) { // if HTTP-status is 200-299
-
-            let event = new Event("bevsuccess");
-            dispatchEvent(event);
-            setTimeout(function () {
-                let event_2 = new Event("bevover");
-                dispatchEvent(event_2);
-            }, 2000);
-
-
-        } else {
-            alert("HTTP-Error: " + response.status);
+    <script>
+        $(document).ready(function () {
+            $('.js-example-basic-multiple').select2();
+        });
+    </script>
+    <script>
+        function showPayPalButton() {
+            var paypalButton = document.getElementById('paypal-button-container');
+            paypalButton.style.display = 'block'; // or 'initial', whichever is appropriate
         }
-    }
-</script>
+
+        function hidePayPalButton() {
+            var paypalButton = document.getElementById('paypal-button-container');
+            paypalButton.style.display = 'none';
+        }
+        async function postBev(tableId, coasterId, bevName, bevEdit) {
+            let response = await fetch('/table/' + tableId + '/coaster/' + coasterId + '/new/' + bevName + '/' + bevEdit)
+            if (response.ok) { // if HTTP-status is 200-299
+
+                let event = new Event("bevsuccess");
+                dispatchEvent(event);
+                setTimeout(function () {
+                    let event_2 = new Event("bevover");
+                    dispatchEvent(event_2);
+                }, 2000);
+
+
+            } else {
+                alert("HTTP-Error: " + response.status);
+            }
+        }
+    </script>
 
 </body>
+
 </html>

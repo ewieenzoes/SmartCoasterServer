@@ -1,17 +1,13 @@
 from datetime import time
 from time import sleep
-
 from django.shortcuts import render
-
-# Create your views here.
+from django.template.loader import render_to_string
 from django.http import HttpResponse
-from untersetzerBroker.models import Untersetzer, Table, Beverage, lastBeverages, BeverageTemplate, paymentRequest, \
-    serviceCall, FoodTemplate, Food, QuickAccessTemplateFood, QuickAccessTemplate, tempCoasterGroup
+from untersetzerBroker.models import Untersetzer, Table, Beverage, lastBeverages, BeverageTemplate, paymentRequest, serviceCall, FoodTemplate, Food, QuickAccessTemplateFood, QuickAccessTemplate, tempCoasterGroup, paymentSuccess
 
 
 def index(request):
     return render(request, 'info.html')
-
 
 def level(request, identifier, glass_level):
     if identifier != '':
@@ -47,6 +43,7 @@ def overview(request):
     newDrinks = lastBeverages.objects.all()  # Get new Drinks
     payment = paymentRequest.objects.all()
     service = serviceCall.objects.all()
+    #success = paymentSuccess.objects.all()
     for coaster in allCoasterData:  # Iterate over Coaster and check for critical
         beverageTemplate = BeverageTemplate.objects.filter(name=coaster.description)
         for bt in beverageTemplate:
@@ -58,6 +55,7 @@ def overview(request):
                    'newDrinks': newDrinks,
                    'payment': payment,
                    'service': service,
+                   #'receipt': success,
                    })
 
 

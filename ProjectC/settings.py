@@ -27,11 +27,11 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['efh.pythonanywhere.com','127.0.0.1', '.untersetzer.digital', '.herokuapp.com']
 
-
 # Application definition
 
 INSTALLED_APPS = [
     'untersetzerBroker.apps.UntersetzerbrokerConfig',
+    'guestServices.apps.GuestservicesConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

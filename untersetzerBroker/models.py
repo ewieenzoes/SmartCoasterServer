@@ -80,6 +80,9 @@ class tempCoasterGroup(models.Model):
 class serviceCall(models.Model):
     coaster = models.ForeignKey('Untersetzer', on_delete=models.CASCADE, related_name='serviceCall')
 
+class paymentSuccess(models.Model):
+    coaster = models.ForeignKey('Untersetzer', on_delete=models.CASCADE, related_name='paymentSuccess')
+
 class paymentRequest(models.Model):
     coaster = models.ForeignKey('Untersetzer', on_delete=models.CASCADE)
     type = models.CharField(max_length=200)
