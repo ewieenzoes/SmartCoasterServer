@@ -18,6 +18,11 @@
             box-shadow: 0 20px 27px 0 rgb(0 0 0 / 5%);
         }
 
+        .flex {
+            display: flex;
+            flex-direction: column;
+        }
+
         .card {
             position: relative;
             display: flex;
@@ -42,37 +47,33 @@
                 <div class="card">
                     <div class="card-body">
                         <div class="invoice-title">
-                            <h4 class="float-end font-size-15">Receipt<span
-                                    class="badge bg-success font-size-12 ms-2">Paid</span></h4>
+                            <h4 class="float-end font-size-15 flex"><span
+                                    class="badge bg-success font-size-12 ms-2">Bezahlt</span>
+                                <span>{{ checkoutSumup.transaction_code }}</span></h4>
                             <div class="mb-4">
-                                <h2 class="mb-1 text-muted">SmartCoaster</h2>
+                                <h4 class="mb-1 text-muted">{{ me.merchant_profile.doing_business_as.business_name }}</h4>
+                                <h6 class="mb-1 text-muted">{{ me.merchant_profile.doing_business_as.dynamic_descriptor }}</h6>
                             </div>
                             <div class="text-muted">
-                                <p class="mb-1">University of Siegen</p>
-                                <!-- <p class="mb-1"><i class="uil uil-envelope-alt me-1"></i> gmail.com</p>
-                                <p><i class="uil uil-phone me-1"></i> phone-number</p> -->
+                                <p class="mb-1">{{ me.merchant_profile.doing_business_as.address.address_line1 }} | {{ me.merchant_profile.doing_business_as.address.post_code }} {{ me.merchant_profile.doing_business_as.address.city }}</p>
                             </div>
                         </div>
 
                         <hr class="my-4">
 
                         <div class="row">
-                            <div class="col-sm-6">
+                            <div class="col-6">
                                 <div class="text-muted">
-                                    <h5 class="font-size-16 mb-3">Billed To:</h5>
-                                    <h5 class="font-size-15 mb-2">SmartCoaster {{ coasterId }} </h5>
+                                    <h5 class="font-size-16 mb-1">Bezahlt über:</h5>
+                                    <p class="font-size-15 mb-2">{{ checkout.coaster }} </p>
                                 </div>
                             </div>
                             <!-- end col -->
-                            <div class="col-sm-6">
+                            <div class="col-6">
                                 <div class="text-muted text-sm-end">
-                                    <div class="mt-4">
-                                        <h5 class="font-size-15 mb-1">Time:</h5>
-                                        <p id="current-time"></p>
-                                    </div>
-                                    <div class="mt-4">
-                                        <h5 class="font-size-15 mb-1">Invoice Date:</h5>
-                                        <p id="invoice-date"></p>
+                                    <div>
+                                        <h5 class="font-size-15 mb-1">Zeitpunkt:</h5>
+                                        <p id="invoice-date">{{ checkoutSumup.date }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -82,18 +83,18 @@
                         <script>
                             // Function to update the current time
                             function updateTime() {
-                                var currentTimeElement = document.getElementById("current-time");
-                                var invoiceDateElement = document.getElementById("invoice-date");
+                                // var currentTimeElement = document.getElementById("current-time");
+                                // var invoiceDateElement = document.getElementById("invoice-date");
 
-                                var currentDate = new Date();
-                                var hours = currentDate.getHours().toString().padStart(2, '0');
-                                var minutes = currentDate.getMinutes().toString().padStart(2, '0');
-                                var formattedTime = hours + ':' + minutes;
+                                // var currentDate = new Date();
+                                // var hours = currentDate.getHours().toString().padStart(2, '0');
+                                // var minutes = currentDate.getMinutes().toString().padStart(2, '0');
+                                // var formattedTime = hours + ':' + minutes;
 
-                                var formattedDate = currentDate.toLocaleDateString();
+                                // var formattedDate = currentDate.toLocaleDateString();
 
-                                currentTimeElement.textContent = formattedTime;
-                                invoiceDateElement.textContent = formattedDate;
+                                // // currentTimeElement.textContent = formattedTime;
+                                // invoiceDateElement.textContent = formattedDate + " " + formattedTime;
                             }
 
                             // Call the updateTime function to update the time and date
@@ -105,15 +106,15 @@
                         <!-- end row -->
 
                         <div class="py-2">
-                            <h5 class="font-size-15">Order Summary</h5>
+                            <h5 class="font-size-15">Verkauf</h5>
 
                             <div class="table-responsive">
                                 <table class="table align-middle table-nowrap table-centered mb-0">
                                     <thead>
                                         <tr>
-                                            <th style="width: 70px;">No.</th>
-                                            <th>Item</th>
-                                            <th>Price</th>
+                                            <th style="width: 70px;">Position</th>
+                                            <th>Artikel</th>
+                                            <th class="text-end">Betrag</th>
                                         </tr>
                                     </thead><!-- end thead -->
                                     <tbody>
@@ -121,16 +122,20 @@
                                         <tr>
                                             <td>{{ forloop.counter }}</td>
                                             <td>
-                                                <h5 class="text-truncate font-size-14 mb-1">{{ item.name }}</h5>
+                                                <h6 class="text-truncate font-size-14 mb-1">{{ item.name }}</h6>
                                             </td>
-                                            <td>{{ item.price }}€</td>
+                                            <td class="text-end" >
+                                                <h6 class="m-0">{{ item.price }} €</h6></td>
                                         </tr>
                                         {% endfor %}
                                         <!-- end tr -->
                                         <tr>
-                                            <th scope="row" colspan="4" class="border-0 text-end">Total</th>
+                                            <td class="border-0" >
+                                                <h2>Summe</h2>
+                                            </td>
+                                            <td class="border-0" ></td>
                                             <td class="border-0 text-end">
-                                                <h4 class="m-0 fw-semibold">{{ total_price }}</h4>
+                                                <h3 class="m-0">{{ checkout.total_price }} €</h3>
                                             </td>
                                         </tr>
                                         <!-- end tr -->
@@ -139,7 +144,7 @@
                             </div><!-- end table responsive -->
                             <div class="d-print-none mt-4">
                                 <div class="float-end">
-                                    <a href="javascript:window.print()" class="btn btn-primary me-1"><i class="fa fa-file-pdf"></i> Save as PDF</a>
+                                    <a href="javascript:window.print()" class="btn btn-primary me-1"><i class="fa fa-file-pdf"></i> Als PDF Speichern</a>
                                 </div>
                             </div>                            
                         </div>

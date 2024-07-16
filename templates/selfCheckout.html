@@ -1,0 +1,204 @@
+<html>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css" />
+<script src="//unpkg.com/alpinejs" defer></script>
+<script src="https://unpkg.com/htmx.org@1.6.1"></script>
+
+<head>
+  <title>Self Checkout</title>
+  <meta name="csrf-token" content="{{ csrf_token }}" />
+  <meta charset="UTF-8" name="viewport"
+    content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <style>
+    .padding {
+      padding: 1rem;
+    }
+
+    .title {
+      text-align: center;
+      font-weight: bold;
+      font-size: 1.75rem;
+    }
+
+    .receipt-container {
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .flex {
+      display: flex;
+
+      justify-content: center;
+      align-items: center;
+    }
+
+    .borderNone {
+      border: none;
+    }
+
+    .displayNone {
+      display: none;
+    }
+
+    .container {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .container .left {
+      text-align: left;
+    }
+
+    .container .right {
+      text-align: right;
+    }
+
+    .input-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .input-row input {
+      text-align: right;
+    }
+
+    .noTip {
+      justify-content: center;
+      display: flex;
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+
+<body class="padding" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+  <div class="receipt-container flex">
+    <!-- Anzeige Rechnung -->
+    <h2 class="title is-4">Ihr Verzehr</h2>
+
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Speisen/Getränke</th>
+          <th>Preis</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for i in dashboardTemplateData %}
+        <tr>
+          <td>{{ i }}</td>
+          <td>{{ i.price }}€</td>
+        </tr>
+        {% endfor %}
+        <tr>
+          <td>Total</td>
+          <td>{{ total_price }}€</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Anzeige Trinkgeldauswahl -->
+    <div id="trinkgeld" x-data="{ enterAmount: false }">
+      <h2 class="title is-4">Trinkgeld auswählen</h2>
+      <div>
+        <button hx-post="/gs/{{ coasterId }}/selfCheckout/addTip/10/-" hx-target="#trinkgeld"
+          class="button is-dark">10%</button>
+        <button hx-post="/gs/{{ coasterId }}/selfCheckout/addTip/15/-" hx-target="#trinkgeld"
+          class="button is-dark">15%</button>
+        <button hx-post="/gs/{{ coasterId }}/selfCheckout/addTip/5/-" hx-target="#trinkgeld"
+          class="button is-dark">5%</button>
+        <button @click="enterAmount = true; onShowManualValueInput(true);" class="button is-light">Manueller
+          Betrag</button>
+      </div>
+      <div class="noTip">
+        <button hx-post="/gs/{{ coasterId }}/selfCheckout/addTip/0/-" hx-target="#trinkgeld"
+          class="button borderNone">Kein Trinkgeld</button>
+      </div>
+
+      <!-- Manuelle Trinkgeld Eingabe -->
+      <div class="modal is-active" x-show="enterAmount" x-cloak>
+        <div class="modal-background"></div>
+        <div class="modal-content">
+          <div class="card">
+            <div class="card-content">
+              <div class="content">
+                <h4 class="title is-4">Summe eingeben</h4>
+                <div class="container">
+                  <div class="left">
+                    <p>Betrag</p>
+                  </div>
+                  <div class="right">
+                    <p>{{ total_price }} €</p>
+                  </div>
+                </div>
+                <div class="input-row">
+                  <div>
+                    <p>Betrag inkl. Trinkgeld</p>
+                  </div>
+                  <div>
+                    <input id="manualInput" type="number" class="input" min="{{ total_price }}" placeholder="0,00 €"
+                      oninput="checkPrice({{ total_price }})" />
+                  </div>
+                </div>
+              </div>
+              <footer class="modal-card-foot">
+                <button class="button is-danger" @click="enterAmount = false; onShowManualValueInput(false);">
+                  Abbrechen
+                </button>
+                <button id="sumbitButton" class="button is-dark"
+                  @click="enterAmount = false; onShowManualValueInput(false); submitTrinkgeld();" disabled="true">
+                  Übernehmen
+                </button>
+                  <p id="message" style="display:none">Min. {{ total_price }} € eingeben</p>
+              </footer>
+            </div>
+          </div>
+          <button class="modal-close is-large" aria-label="close"></button>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div id="sumup-card"></div>
+    <script type="text/javascript" src="https://gateway.sumup.com/gateway/ecom/card/v2/sdk.js"></script>
+
+    <script type="text/javascript">
+      function checkPrice(minPrice, test) {
+        console.log(minPrice)
+        var value = Number.parseFloat(document.getElementById('manualInput').value)
+        var submitBtn = document.getElementById('sumbitButton');
+        var message = document.getElementById('message');
+        if (value >= minPrice) {
+          submitBtn.disabled = false;
+          submitBtn.setAttribute("hx-post", "/gs/1/selfCheckout/addTip/-/" + value);
+          message.style.display = 'none';
+        } else {
+          submitBtn.disabled = true;
+          submitBtn.setAttribute("hx-post", "/gs/1/selfCheckout/addTip/-/" + value);
+          message.style.display = 'block';
+        }
+        var manualInput = document.getElementById("manualInput");
+        manualInput.classList.remove("displayNone");
+      }
+
+      async function submitTrinkgeld() {
+        var value = Number.parseFloat(document.getElementById('manualInput').value)
+        htmx.ajax('POST', "/gs/1/selfCheckout/addTip/-/" + value, "#trinkgeld");
+      }
+
+      function onShowManualValueInput(bShow) {
+        var manualInput = document.getElementById("manualInput");
+        if (bShow) {
+
+          manualInput.classList.remove("displayNone");
+        } else {
+          manualInput.classList.add("displayNone");
+        }
+      }
+
+    </script>
+</body>
+
+</html>

@@ -103,20 +103,23 @@
                 </div>
                 <div class="column">
                     <h1 class="title">Zahlungswünsche</h1>
-                    {% for request in payment %}
+                    {% for pay in payment %}
                     <div class="mb-5" x-data="{show:true}">
                         <article class="message is-link is-light" x-show="show">
                             <div class="message-header">
-                                <p>Zahlungswunsch {{ request.type }}: </p>
+                                <p>Zahlungswunsch {{ pay.type }}: </p>
                                 <button @click=" show=false" class="delete" aria-label="delete"></button>
                             </div>
                             <div class="message-body">
-                                <b>Untersetzer {{ request.coaster.identifier }}</b><br>
-                                Tisch {{ request.coaster.table }}<br>
-                                Art: {{ request.type }}
+                                <b>Untersetzer {{ pay.coaster.identifier }}</b><br>
+                                {{ pay.coaster.table }}<br>
+                                Art: {{ pay.type }}
                             </div>
-                            <button hx-post="/gs/requestPayment/{{ request.id }}/delete" @click="show=false"
-                                class="button is-link ml-3 mb-3">Zahlung abgeschlossen
+                            <button @click="location.href='sumupmerchant://pay/1.0?amount=12.12&currency=EUR&affiliate-key=sup_afk_zPK20w3AxoayB16E8h3d18i5W9zlr9sY&title=LOSGEHTS&callbacksuccess={{ request.build_absolute_uri }}&skip-screen-success=true'"
+                                class="button is-link ml-3 mb-3">Zahlung starten
+                            </button>
+                            <button hx-post="/gs/requestPayment/{{ pay.id }}/delete" @click="show=false"
+                                class="button is-link ml-3 mb-3">Entfernen
                             </button>
                         </article>
                     </div>
@@ -139,7 +142,7 @@
                         </article>
                     </div>
                     {% endfor %}
-                    <!-- <h1 class="title">Payments</h1>
+                    <h1 class="title">Payments</h1>
                     {% for request in receipt %}
                     <div class="mb-5" x-data="{show:true}">
                         <article class="message" x-show="show">
@@ -156,7 +159,7 @@
                             </button>
                         </article>
                     </div>
-                    {% endfor %} -->
+                    {% endfor %} 
                 </div>
             </div>
         </div>

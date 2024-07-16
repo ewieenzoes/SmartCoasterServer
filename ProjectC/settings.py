@@ -9,12 +9,15 @@ https://docs.djangoproject.com/en/4.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
-
+import os
+from dotenv import load_dotenv
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+#Lade .env File
+load_dotenv(os.path.join(BASE_DIR, '.env'))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
@@ -126,3 +129,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 STATIC_ROOT = "/home/efh/ProjectC/static"
 STATIC_URL = 'static/'
 
+#SUM UP Integration, der API KEY muss iim Rootverzeichnis der .env Datei hinterlegt sein
+SUMUUP_API_URL = "https://api.sumup.com/v0.1/"
+SUMUP_RECEIPT_URL = "https://sales-receipt.sumup.com/pos/public/v1/"
+SUMUPAPI_TOKEN = os.getenv("SUMUPAPI_TOKEN")
+ALLOWED_HOSTS = ['*']
