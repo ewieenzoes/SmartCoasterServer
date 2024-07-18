@@ -1,10 +1,8 @@
 from datetime import time
-import json
 from time import sleep
 from django.shortcuts import render
 from django.template.loader import render_to_string
 from django.http import HttpResponse
-from untersetzerBroker.sumup import SumupAPI
 from untersetzerBroker.models import Untersetzer, Table, Beverage, lastBeverages, BeverageTemplate, paymentRequest, serviceCall, FoodTemplate, Food, QuickAccessTemplateFood, QuickAccessTemplate, tempCoasterGroup, paymentSuccess
 
 
@@ -45,7 +43,7 @@ def overview(request):
     newDrinks = lastBeverages.objects.all()  # Get new Drinks
     payment = paymentRequest.objects.all()
     service = serviceCall.objects.all()
-    success = paymentSuccess.objects.all()
+    #success = paymentSuccess.objects.all()
     for coaster in allCoasterData:  # Iterate over Coaster and check for critical
         beverageTemplate = BeverageTemplate.objects.filter(name=coaster.description)
         for bt in beverageTemplate:
@@ -57,7 +55,7 @@ def overview(request):
                    'newDrinks': newDrinks,
                    'payment': payment,
                    'service': service,
-                   'receipt': success,
+                   #'receipt': success,
                    })
 
 
@@ -325,13 +323,3 @@ def coasterUndo(request, identifier):
     resp = HttpResponse("Letztes Getränk entfernt")
     ##resp['HX-Refresh'] = "true"
     return resp
-
-def sumup(request):
-    service = SumupAPI()
-    me = service.get('me')
-    transactions = service.get("me/transactions/history?order=descending")
-    for obj in transactions['items']:
-        if ['obj.client_transaction_id']:
-            obj['receipt_url'] = service.get_reciept_url(obj['client_transaction_id'].split(";")[0][-36:])
-
-    return render(request, 'sumup.html', {'me': me, "transactions": transactions})

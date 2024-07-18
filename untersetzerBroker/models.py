@@ -86,21 +86,3 @@ class paymentSuccess(models.Model):
 class paymentRequest(models.Model):
     coaster = models.ForeignKey('Untersetzer', on_delete=models.CASCADE)
     type = models.CharField(max_length=200)
-
-class Checkout(models.Model):
-    checkout_reference = models.CharField(max_length=200)
-    total_price = models.FloatField(default=0)
-    tip = models.FloatField(default=0)
-    # coaster = models.ForeignKey('Untersetzer', on_delete=models.CASCADE, related_name='checkout')
-
-    def __str__(self):
-        return self.checkout_reference
-    
-class CheckoutPositions(models.Model):
-    checkout_reference = models.CharField(max_length=200)
-    price = models.FloatField(default=0)
-    name = models.CharField(max_length=200)
-    # checkout = models.ForeignKey('Checkout', on_delete=models.CASCADE, related_name='positions')
-
-    def __str__(self):
-        return self.checkout_reference
